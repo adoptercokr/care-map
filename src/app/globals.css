@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+:root {
+  --font-pretendard: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --bg-main: #f8fafc;
+  --card-bg: #ffffff;
+  --border-subtle: #e2e8f0;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --brand-primary: #0e8a8d;
+  --brand-hover: #0a7073;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: var(--font-pretendard);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, a, select, [role="button"] {
+  cursor: pointer;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+}
+
+.leaflet-container {
+  font-family: var(--font-pretendard);
+  background: #eef2f6;
+}
