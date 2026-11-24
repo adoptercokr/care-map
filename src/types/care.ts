@@ -25,15 +25,15 @@ export interface CareFacility {
   lat: number;
   lng: number;
   tel: string;
-  capacity: number;
-  current: number;
-  waiting: number;
+  capacity: number | null;
+  current: number | null;
+  waiting: number | null;
   staffCare: number;
   staffNurse: number;
-  mealCost: number;
-  room1Cost: number;
-  room2Cost: number;
-  monthlyBaseEstimate: number;
+  mealCost: number | null;
+  room1Cost: number | null;
+  room2Cost: number | null;
+  monthlyBaseEstimate: number | null;
   established: string;
   tags: string[];
 }

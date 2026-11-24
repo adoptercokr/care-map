@@ -29,7 +29,10 @@ export default function FacilityDetailSheet({
   if (!facility) return null;
 
   const badge = GRADE_BADGE[facility.grade] || GRADE_BADGE.NEW;
-  const occupancyPct = facility.capacity > 0 ? Math.round((facility.current / facility.capacity) * 100) : 0;
+  const occupancyPct =
+    facility.capacity && facility.current !== null && facility.capacity > 0
+      ? Math.round((facility.current / facility.capacity) * 100)
+      : null;
   const kakaoMapUrl = `https://map.kakao.com/link/to/${encodeURIComponent(facility.name)},${facility.lat},${facility.lng}`;
   const naverMapUrl = `https://map.naver.com/p/search/${encodeURIComponent(facility.name + ' ' + facility.sigungu)}`;
   const telHref = facility.tel ? `tel:${facility.tel.replace(/[^0-9+]/g, '')}` : undefined;
@@ -57,11 +60,11 @@ export default function FacilityDetailSheet({
               >
                 {facility.ownership}
               </span>
-              {facility.room1Cost > 0 && (
+              {facility.room1Cost && facility.room1Cost > 0 ? (
                 <span className="px-2 py-0.5 rounded-md text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200">
                   1인실
                 </span>
-              )}
+              ) : null}
             </div>
             <h3 className="text-lg font-bold text-slate-900 leading-snug">{facility.name}</h3>
           </div>
@@ -96,23 +99,24 @@ export default function FacilityDetailSheet({
           </div>
         </div>
 
-        {/* 핵심 4대 지표 그리드 */}
+        {/* 핵심 지표 그리드 (실제 수집 데이터만 표기) */}
         <div className="mt-4 grid grid-cols-3 gap-2.5">
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <div className="text-xs text-slate-500">정원 / 현원</div>
             <div className="mt-1 text-base font-bold text-slate-900">
-              {facility.current} / {facility.capacity}명
-            </div>
-            <div className="text-xs text-slate-500">가동률 {occupancyPct}%</div>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <div className="text-xs text-slate-500">입소 대기</div>
-            <div className={`mt-1 text-base font-bold ${facility.waiting === 0 ? 'text-teal-700' : 'text-amber-700'}`}>
-              {facility.waiting === 0 ? '즉시 가능' : `${facility.waiting}명 대기`}
+              {facility.capacity ? `${facility.capacity}명` : '해당없음'}
+              {facility.current !== null ? ` / ${facility.current}명` : ''}
             </div>
             <div className="text-xs text-slate-500">
-              {facility.score ? `평가 ${facility.score}점` : '평가 예정'}
+              {occupancyPct !== null ? `가동률 ${occupancyPct}%` : '공단 원천 기준'}
             </div>
+          </div>
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
+            <div className="text-xs text-slate-500">평가 점수</div>
+            <div className="mt-1 text-base font-bold text-[#0e8a8d]">
+              {facility.score ? `${facility.score}점` : facility.grade === 'NEW' ? '평가 예정' : `${facility.grade}등급`}
+            </div>
+            <div className="text-xs text-slate-500">{facility.evalYear}년 기준</div>
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <div className="text-xs text-slate-500">돌봄 인력</div>
@@ -126,21 +130,16 @@ export default function FacilityDetailSheet({
           </div>
         </div>
 
-        {/* 월 예상 본인부담금 (3등급 일반 기준) */}
+        {/* 월 예상 본인부담금 (실측 데이터 있을 때만 표시) */}
         <div className="mt-3.5 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-slate-700">월 예상 본인부담금</span>
-            <span className="text-lg font-extrabold text-slate-900">
-              약 {facility.monthlyBaseEstimate.toLocaleString()}원
+            <span className="text-base font-extrabold text-slate-900">
+              {facility.monthlyBaseEstimate
+                ? `약 ${facility.monthlyBaseEstimate.toLocaleString()}원`
+                : '기관 직접 문의'}
             </span>
           </div>
-          {facility.type === 'nursing' && (
-            <div className="mt-2 pt-2 border-t border-slate-200/70 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-600">
-              <span>식비·간식비 {facility.mealCost.toLocaleString()}원</span>
-              {facility.room2Cost > 0 && <span>2인실 +{facility.room2Cost.toLocaleString()}원</span>}
-              {facility.room1Cost > 0 && <span>1인실 +{facility.room1Cost.toLocaleString()}원</span>}
-            </div>
-          )}
         </div>
 
         {/* 하단 액션: 비교함 + 네이버 지도 + 카카오맵 (심플 상용 스타일) */}

@@ -254,13 +254,14 @@ export default function HomeHub({
                       <div className="p-3 rounded-xl bg-[#f7f8fa]">
                         <div className="text-xs text-slate-500">정원 / 현원</div>
                         <div className="mt-1 text-base font-bold text-slate-900">
-                          {previewSelected.current}/{previewSelected.capacity}명
+                          {previewSelected.capacity ? `${previewSelected.capacity}명` : '재가/방문'}
+                          {previewSelected.current !== null ? ` / ${previewSelected.current}명` : ''}
                         </div>
                       </div>
                       <div className="p-3 rounded-xl bg-[#f7f8fa]">
-                        <div className="text-xs text-slate-500">입소 대기</div>
-                        <div className="mt-1 text-base font-bold text-teal-700">
-                          {previewSelected.waiting === 0 ? '즉시 가능' : `${previewSelected.waiting}명`}
+                        <div className="text-xs text-slate-500">평가 점수</div>
+                        <div className="mt-1 text-base font-bold text-[#0e8a8d]">
+                          {previewSelected.score ? `${previewSelected.score}점` : previewSelected.grade === 'NEW' ? '예정' : `${previewSelected.grade}등급`}
                         </div>
                       </div>
                       <div className="p-3 rounded-xl bg-[#f7f8fa]">
@@ -273,8 +274,10 @@ export default function HomeHub({
 
                     <div className="mt-4 p-3.5 rounded-xl border border-slate-200 flex items-center justify-between">
                       <span className="text-sm font-medium text-slate-600">월 예상 본인부담금</span>
-                      <span className="text-lg font-extrabold text-[#191f28]">
-                        약 {previewSelected.monthlyBaseEstimate.toLocaleString()}원
+                      <span className="text-base font-extrabold text-[#191f28]">
+                        {previewSelected.monthlyBaseEstimate
+                          ? `약 ${previewSelected.monthlyBaseEstimate.toLocaleString()}원`
+                          : '비용 계산기 참고'}
                       </span>
                     </div>
                   </div>
@@ -335,7 +338,7 @@ export default function HomeHub({
                       <div className="mt-1 flex items-center justify-between text-sm text-slate-500">
                         <span className="truncate pr-2">{f.addr}</span>
                         <span className="font-bold text-slate-900 shrink-0">
-                          {f.monthlyBaseEstimate.toLocaleString()}원~
+                          {f.capacity ? `정원 ${f.capacity}명` : `인력 ${f.staffCare + f.staffNurse}명`}
                         </span>
                       </div>
                     </div>
@@ -415,11 +418,11 @@ export default function HomeHub({
                     >
                       {f.ownership}
                     </span>
-                    {f.room1Cost > 0 && (
+                    {f.room1Cost && f.room1Cost > 0 ? (
                       <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200">
                         1인실
                       </span>
-                    )}
+                    ) : null}
                   </div>
                   <h3 className="text-lg font-extrabold text-[#191f28]">{f.name}</h3>
                   <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">
@@ -443,25 +446,26 @@ export default function HomeHub({
                   <div className="p-2.5 rounded-xl bg-[#f7f8fa]">
                     <div className="text-[11px] text-slate-500">정원 / 현원</div>
                     <div className="mt-0.5 text-sm font-bold text-slate-900">
-                      {f.capacity} / {f.current}명
+                      {f.capacity ? `${f.capacity}명` : '재가/방문'}
+                      {f.current !== null ? ` / ${f.current}명` : ''}
                     </div>
                   </div>
                   <div className="p-2.5 rounded-xl bg-[#f7f8fa]">
-                    <div className="text-[11px] text-slate-500">입소 대기</div>
-                    <div className={`mt-0.5 text-sm font-bold ${f.waiting === 0 ? 'text-teal-700' : 'text-amber-700'}`}>
-                      {f.waiting === 0 ? '대기 없음' : `${f.waiting}명`}
-                    </div>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-[#f7f8fa]">
-                    <div className="text-[11px] text-slate-500">1인실 추가</div>
+                    <div className="text-[11px] text-slate-500">돌봄 인력</div>
                     <div className="mt-0.5 text-sm font-bold text-slate-900">
-                      {f.room1Cost > 0 ? `+${Math.round(f.room1Cost / 10000)}만` : '없음'}
+                      {f.staffCare + f.staffNurse}명
+                    </div>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-[#f7f8fa]">
+                    <div className="text-[11px] text-slate-500">평가 점수</div>
+                    <div className="mt-0.5 text-sm font-bold text-[#0e8a8d]">
+                      {f.score ? `${f.score}점` : f.grade === 'NEW' ? '예정' : `${f.grade}등급`}
                     </div>
                   </div>
                   <div className="col-span-3 sm:col-span-1 p-2.5 rounded-xl bg-[#eef8f8] border border-[#cbe8e8]">
-                    <div className="text-[11px] text-slate-600">월 예상 부담</div>
+                    <div className="text-[11px] text-slate-600">설립 / 지정</div>
                     <div className="mt-0.5 text-sm font-extrabold text-[#0e8a8d]">
-                      {Math.round(f.monthlyBaseEstimate / 10000)}만 원~
+                      {f.established.slice(0, 4)}년
                     </div>
                   </div>
                 </div>

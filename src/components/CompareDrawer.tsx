@@ -71,19 +71,16 @@ export default function CompareDrawer({ items, isOpen, onClose, onRemove }: Comp
                   <td className="py-3 px-3 text-xs font-medium text-slate-500">정원 / 현원</td>
                   {items.map((item) => (
                     <td key={item.id} className="py-3 px-3 text-slate-800">
-                      {item.current} / {item.capacity}명
+                      {item.capacity ? `${item.capacity}명` : '해당없음'}
+                      {item.current !== null ? ` / ${item.current}명` : ''}
                     </td>
                   ))}
                 </tr>
                 <tr>
-                  <td className="py-3 px-3 text-xs font-medium text-slate-500">입소 대기</td>
+                  <td className="py-3 px-3 text-xs font-medium text-slate-500">설립 구분</td>
                   {items.map((item) => (
-                    <td key={item.id} className="py-3 px-3 font-semibold">
-                      {item.waiting === 0 ? (
-                        <span className="text-teal-700">즉시 가능</span>
-                      ) : (
-                        <span className="text-amber-700">{item.waiting}명</span>
-                      )}
+                    <td key={item.id} className="py-3 px-3 font-semibold text-slate-800">
+                      {item.ownership}
                     </td>
                   ))}
                 </tr>
@@ -96,28 +93,10 @@ export default function CompareDrawer({ items, isOpen, onClose, onRemove }: Comp
                   ))}
                 </tr>
                 <tr>
-                  <td className="py-3 px-3 text-xs font-medium text-slate-500">월 예상 본인부담금</td>
-                  {items.map((item) => (
-                    <td key={item.id} className="py-3 px-3 font-bold text-slate-900">
-                      {item.monthlyBaseEstimate.toLocaleString()}원
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td className="py-3 px-3 text-xs font-medium text-slate-500">비급여 (식비)</td>
-                  {items.map((item) => (
-                    <td key={item.id} className="py-3 px-3 text-slate-700">
-                      {item.mealCost > 0 ? `${item.mealCost.toLocaleString()}원` : '해당없음'}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td className="py-3 px-3 text-xs font-medium text-slate-500">상급침실료 (1/2인)</td>
+                  <td className="py-3 px-3 text-xs font-medium text-slate-500">전화번호</td>
                   {items.map((item) => (
                     <td key={item.id} className="py-3 px-3 text-slate-700 text-xs">
-                      {item.room1Cost > 0 || item.room2Cost > 0
-                        ? `1인 +${item.room1Cost.toLocaleString()} / 2인 +${item.room2Cost.toLocaleString()}`
-                        : '다인실 기준 / 해당없음'}
+                      {item.tel || '미제공'}
                     </td>
                   ))}
                 </tr>

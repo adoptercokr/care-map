@@ -59,10 +59,10 @@ const GRADE_PILL: Record<string, string> = {
 const TYPE_ICON_BADGE: Record<string, { bg: string; icon: React.ComponentType<{ className?: string }> }> = {
   nursing: { bg: 'bg-[#0e8a8d]', icon: Building2 },
   daycare: { bg: 'bg-[#0284c7]', icon: Sun },
-  hospital: { bg: 'bg-[#0f766e]', icon: Stethoscope },
-  silvertown: { bg: 'bg-slate-600', icon: Home },
-  hospcare: { bg: 'bg-[#0d9488]', icon: HeartHandshake },
-  homecare: { bg: 'bg-[#0369a1]', icon: UserCheck },
+  hospital: { bg: 'bg-[#e11d48]', icon: Stethoscope },
+  silvertown: { bg: 'bg-[#6366f1]', icon: Home },
+  hospcare: { bg: 'bg-[#d97706]', icon: HeartHandshake },
+  homecare: { bg: 'bg-[#0d9488]', icon: UserCheck },
 };
 
 export default function HomePage() {
@@ -463,11 +463,11 @@ export default function HomePage() {
                       <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-700">
                         {selectedFacility.ownership}
                       </span>
-                      {selectedFacility.room1Cost > 0 && (
+                      {selectedFacility.room1Cost && selectedFacility.room1Cost > 0 ? (
                         <span className="px-2 py-0.5 rounded-md text-xs font-bold bg-[#eef8f8] text-[#0e8a8d] border border-[#cbe8e8]">
                           1인실
                         </span>
-                      )}
+                      ) : null}
                     </div>
                     <h2 className="text-xl font-extrabold text-slate-900 leading-snug">
                       {selectedFacility.name}
@@ -498,17 +498,14 @@ export default function HomePage() {
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
                       <div className="text-xs text-slate-500">정원 / 현원</div>
                       <div className="mt-1 text-base font-bold text-slate-900">
-                        {selectedFacility.capacity} / {selectedFacility.current}명
+                        {selectedFacility.capacity ? `${selectedFacility.capacity}명` : '재가/방문'}
+                        {selectedFacility.current !== null ? ` / ${selectedFacility.current}명` : ''}
                       </div>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <div className="text-xs text-slate-500">입소 대기</div>
-                      <div
-                        className={`mt-1 text-base font-bold ${
-                          selectedFacility.waiting === 0 ? 'text-[#0e8a8d]' : 'text-amber-700'
-                        }`}
-                      >
-                        {selectedFacility.waiting === 0 ? '대기 없음' : `${selectedFacility.waiting}명`}
+                      <div className="text-xs text-slate-500">평가 점수</div>
+                      <div className="mt-1 text-base font-bold text-[#0e8a8d]">
+                        {selectedFacility.score ? `${selectedFacility.score}점` : selectedFacility.grade === 'NEW' ? '예정' : `${selectedFacility.grade}등급`}
                       </div>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
@@ -521,22 +518,11 @@ export default function HomePage() {
 
                   <div className="p-4 rounded-xl bg-[#eef8f8] border border-[#cbe8e8] space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-slate-700">월 예상 본인부담금</span>
-                      <span className="text-lg font-extrabold text-[#0e8a8d]">
-                        약 {selectedFacility.monthlyBaseEstimate.toLocaleString()}원
+                      <span className="text-sm font-semibold text-slate-700">설립 / 지정일</span>
+                      <span className="text-base font-extrabold text-[#0e8a8d]">
+                        {selectedFacility.established}
                       </span>
                     </div>
-                    {selectedFacility.type === 'nursing' && (
-                      <div className="text-xs text-slate-600 flex flex-wrap gap-x-3 gap-y-1 pt-1 border-t border-[#cbe8e8]">
-                        <span>식비 {selectedFacility.mealCost.toLocaleString()}원</span>
-                        {selectedFacility.room2Cost > 0 && (
-                          <span>2인실 +{selectedFacility.room2Cost.toLocaleString()}원</span>
-                        )}
-                        {selectedFacility.room1Cost > 0 && (
-                          <span>1인실 +{selectedFacility.room1Cost.toLocaleString()}원</span>
-                        )}
-                      </div>
-                    )}
                   </div>
 
                   <div className="space-y-2 pt-1">
@@ -649,10 +635,10 @@ export default function HomePage() {
 
                             <div className="mt-2 flex items-center justify-between text-sm">
                               <span className="text-slate-500">
-                                정원 {f.capacity}명 · {f.ownership}
+                                {f.capacity ? `정원 ${f.capacity}명` : '재가/방문'} · {f.ownership}
                               </span>
-                              <span className="font-extrabold text-slate-900">
-                                월 {f.monthlyBaseEstimate.toLocaleString()}원~
+                              <span className="font-bold text-[#0e8a8d]">
+                                인력 {f.staffCare + f.staffNurse}명
                               </span>
                             </div>
                           </div>

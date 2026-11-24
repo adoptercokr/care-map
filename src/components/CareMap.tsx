@@ -28,27 +28,27 @@ interface CareMapProps {
 
 const TYPE_MARKER_STYLE: Record<string, { color: string; svg: string }> = {
   nursing: {
-    color: '#0e8a8d',
+    color: '#0e8a8d', // 요양원 (그린블루 + 집 아이콘)
     svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
   },
   daycare: {
-    color: '#0284c7',
+    color: '#0284c7', // 주간보호 (스카이 블루 + 해 아이콘)
     svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg>',
   },
   hospital: {
-    color: '#0f766e',
+    color: '#e11d48', // 요양병원 (로즈 레드 + 십자가 아이콘)
     svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="white"><rect x="9.5" y="3" width="5" height="18" rx="1.5"/><rect x="3" y="9.5" width="18" height="5" rx="1.5"/></svg>',
   },
   silvertown: {
-    color: '#334155',
-    svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/></svg>',
+    color: '#6366f1', // 실버타운 (인디고 + 빌딩 아이콘)
+    svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1"/></svg>',
   },
   hospcare: {
-    color: '#0d9488',
+    color: '#d97706', // 병원간병 (앰버 + 하트 아이콘)
     svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
   },
   homecare: {
-    color: '#0369a1',
+    color: '#0d9488', // 집간병·방문요양 (틸 + 사람 아이콘)
     svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.3"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>',
   },
 };
@@ -121,7 +121,7 @@ export default function CareMap({
         const size = count >= 30 ? 44 : count >= 10 ? 38 : 32;
         const icon = L.divIcon({
           className: 'care-cluster-icon',
-          html: `<div style="width:${size}px;height:${size}px;border-radius:9999px;background:#0f172a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;border:2px solid #fff;box-shadow:0 4px 12px rgba(15,23,42,0.22);">${count}</div>`,
+          html: `<div style="width:${size}px;height:${size}px;border-radius:9999px;background:#0e8a8d;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;border:2.5px solid #fff;box-shadow:0 4px 12px rgba(14,138,141,0.32);">${count}</div>`,
           iconSize: [size, size],
           iconAnchor: [size / 2, size / 2],
         });
@@ -142,10 +142,10 @@ export default function CareMap({
           className: 'care-pin-icon',
           html: isSelected
             ? `
-            <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:9999px;background:#0f172a;color:#ffffff;border:2px solid #0f766e;box-shadow:0 6px 16px rgba(15,23,42,0.28);white-space:nowrap;transform:scale(1.06);">
-              <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:9999px;background:${mStyle.color};flex-shrink:0;">${mStyle.svg}</span>
+            <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:9999px;background:#0e8a8d;color:#ffffff;border:2px solid #ffffff;box-shadow:0 6px 16px rgba(14,138,141,0.35);white-space:nowrap;transform:scale(1.06);">
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:9999px;background:rgba(255,255,255,0.2);flex-shrink:0;">${mStyle.svg}</span>
               <span style="font-size:12px;font-weight:700;letter-spacing:-0.02em;max-width:140px;overflow:hidden;text-overflow:ellipsis;">${f.name}</span>
-              <span style="font-size:11px;font-weight:800;color:#5eead4;">${gradeBadge}</span>
+              <span style="font-size:11px;font-weight:800;color:#ccfbf1;">${gradeBadge}</span>
             </div>
           `
             : `

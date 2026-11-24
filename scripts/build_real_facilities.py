@@ -153,8 +153,8 @@ def main():
         code = str(r[0]).strip()
         tcode = str(r[1] or "").strip()
         tname = str(r[2] or "").strip()
-        cap = int(r[3]) if isinstance(r[3], (int, float)) else 0
-        cur = int(r[4]) if len(r) > 4 and isinstance(r[4], (int, float)) else (int(cap * 0.88) if cap > 0 else 0)
+        cap = int(r[3]) if isinstance(r[3], (int, float)) else None
+        cur = int(r[4]) if len(r) > 4 and isinstance(r[4], (int, float)) else None
         ftype, ftype_name, prio = classify_type(tcode, tname, "")
         prev = cap_map.get(code)
         if not prev or prio < prev["prio"]:
@@ -217,24 +217,17 @@ def main():
             cap, cur = cinfo["capacity"], cinfo["current"]
         else:
             ftype, ftype_name, _ = classify_type("", "", name)
-            cap, cur = 0, 0
+            cap, cur = None, None
 
         dlat, dlng = deterministic_jitter(code)
         st = staff_map.get(code, {"care": 0, "nurse": 0})
         grade = ev["grade"] if ev else "NEW"
         score = ev["score"] if ev else None
-        eval_year = ev["evalYear"] if ev else "2025"
+        eval_year = ev["evalYear"] if ev else ""
         ownership = ev["ownership"] if ev else ("공립" if ("구립" in name or "시립" in name or "군립" in name or "도립" in name) else "개인")
 
-        if ftype == "nursing":
-            meal, r1, r2, est_cost = 330000, (450000 if cap >= 25 else 0), (200000 if cap >= 20 else 0), 795000
-        elif ftype == "daycare":
-            meal, r1, r2, est_cost = 145000, 0, 0, 312000
-        else:
-            meal, r1, r2, est_cost = 0, 0, 0, 185000
-
         addr = str(r[9] or area_str).strip()
-        est = str(r[7] or "20180101").strip()
+        est = str(r[7] or "").strip()
         est_fmt = f"{est[:4]}-{est[4:6]}-{est[6:8]}" if len(est) >= 8 else est
 
         facilities.append({
@@ -254,13 +247,13 @@ def main():
             "tel": "",
             "capacity": cap,
             "current": cur,
-            "waiting": 0 if cap == 0 or cur < cap else 2,
+            "waiting": None,
             "staffCare": st["care"],
             "staffNurse": st["nurse"],
-            "mealCost": meal,
-            "room1Cost": r1,
-            "room2Cost": r2,
-            "monthlyBaseEstimate": est_cost,
+            "mealCost": None,
+            "room1Cost": None,
+            "room2Cost": None,
+            "monthlyBaseEstimate": None,
             "established": est_fmt,
             "tags": [ftype_name, ownership],
         })
