@@ -1,10 +1,70 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Send, CheckCircle2, Loader2 } from 'lucide-react';
 
 export default function Footer() {
   const [policyType, setPolicyType] = useState<'terms' | 'privacy' | 'contact' | null>(null);
+
+  const [contactType, setContactType] = useState<'general' | 'correction' | 'ad'>('general');
+  const [company, setCompany] = useState('');
+  const [title, setTitle] = useState('');
+  const [replyTo, setReplyTo] = useState('');
+  const [message, setMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [sendResult, setSendResult] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const handleOpenContact = () => {
+    setSendResult(null);
+    setPolicyType('contact');
+  };
+
+  const handleSubmitContact = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!replyTo.trim() || !message.trim()) {
+      setSendResult({ ok: false, text: '회신 연락처와 문의 내용을 모두 입력해 주세요.' });
+      return;
+    }
+
+    setIsSending(true);
+    setSendResult(null);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: contactType,
+          company,
+          title,
+          contact: replyTo,
+          message,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSendResult({
+          ok: true,
+          text: data.message || '문의가 정상적으로 발송되었습니다.',
+        });
+        setCompany('');
+        setTitle('');
+        setReplyTo('');
+        setMessage('');
+      } else {
+        setSendResult({
+          ok: false,
+          text: data.error || '전송에 실패했습니다. 잠시 후 다시 시도해 주세요.',
+        });
+      }
+    } catch {
+      setSendResult({
+        ok: false,
+        text: '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   return (
     <>
@@ -33,14 +93,14 @@ export default function Footer() {
               <button onClick={() => setPolicyType('privacy')} className="hover:text-[#0e8a8d]">
                 개인정보처리방침
               </button>
-              <button onClick={() => setPolicyType('contact')} className="hover:text-[#0e8a8d]">
+              <button onClick={handleOpenContact} className="hover:text-[#0e8a8d]">
                 제휴·문의하기
               </button>
             </div>
           </div>
 
           <div className="mt-6 pt-5 border-t border-slate-200/80 text-xs text-slate-500">
-            <div>© {new Date().getFullYear()} CareMap. All rights reserved.</div>
+            <div>© {new Date().getFullYear()} care.animap.co.kr · 케어맵. All rights reserved.</div>
           </div>
         </div>
       </footer>
@@ -63,7 +123,7 @@ export default function Footer() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="p-5 text-sm text-slate-600 leading-relaxed space-y-3">
+            <div className="p-5 text-sm text-slate-600 leading-relaxed space-y-3 max-h-[80vh] overflow-y-auto">
               {policyType === 'terms' && (
                 <>
                   <p>케어맵은 국민건강보험공단과 건강보험심사평가원의 공개 데이터를 바탕으로 전국 요양시설 및 요양병원 정보를 제공합니다.</p>
@@ -77,10 +137,117 @@ export default function Footer() {
                 </>
               )}
               {policyType === 'contact' && (
-                <>
-                  <p>기관 정보 수정 요청, 신규 시설 등록, 광고 및 제휴 문의는 아래 이메일로 연락해 주시면 확인 후 반영해 드립니다.</p>
-                  <p className="font-bold text-[#0e8a8d]">이메일: contact@caremap.kr</p>
-                </>
+                <form onSubmit={handleSubmitContact} className="space-y-3.5">
+                  <p className="text-xs sm:text-sm text-slate-500">
+                    시설 정보 수정 요청, 서비스 오류 제보, 광고·제휴 문의를 남겨주시면 담당자에게 즉시 메일로 전달됩니다.
+                  </p>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'general', label: '일반 문의' },
+                      { id: 'correction', label: '정보 수정' },
+                      { id: 'ad', label: '광고·제휴' },
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setContactType(opt.id as 'general' | 'correction' | 'ad')}
+                        className={`py-2 px-2 rounded-lg text-xs font-bold border transition ${
+                          contactType === opt.id
+                            ? 'bg-[#0e8a8d] text-white border-[#0e8a8d]'
+                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      기관명 / 업체명 (선택)
+                    </label>
+                    <input
+                      type="text"
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
+                      placeholder="예: OO요양원 또는 업체명"
+                      className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-[#0e8a8d]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      회신받을 연락처 또는 이메일 <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={replyTo}
+                      onChange={(e) => setReplyTo(e.target.value)}
+                      placeholder="이메일 또는 휴대폰 번호"
+                      className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-[#0e8a8d]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      문의 제목 (선택)
+                    </label>
+                    <input
+                      type="text"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="예: 시설 전화번호 수정 요청"
+                      className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-[#0e8a8d]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      문의 내용 <span className="text-rose-500">*</span>
+                    </label>
+                    <textarea
+                      required
+                      rows={4}
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder="자세한 내용을 적어주세요."
+                      className="w-full p-3 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-[#0e8a8d] resize-none"
+                    />
+                  </div>
+
+                  {sendResult && (
+                    <div
+                      className={`p-3 rounded-xl text-xs sm:text-sm font-medium flex items-start gap-2 ${
+                        sendResult.ok
+                          ? 'bg-teal-50 text-teal-800 border border-teal-200'
+                          : 'bg-rose-50 text-rose-700 border border-rose-200'
+                      }`}
+                    >
+                      {sendResult.ok && <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />}
+                      <span>{sendResult.text}</span>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isSending}
+                    className="w-full h-11 rounded-xl bg-[#0e8a8d] hover:bg-[#0b7275] disabled:opacity-60 text-white text-sm font-bold flex items-center justify-center gap-2 transition"
+                  >
+                    {isSending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>전송 중...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        <span>문의 메일 보내기</span>
+                      </>
+                    )}
+                  </button>
+                </form>
               )}
             </div>
           </div>
