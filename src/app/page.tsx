@@ -617,12 +617,8 @@ export default function HomePage() {
                                 </span>
                                 <span className="text-xs font-medium text-slate-500">{f.typeName}</span>
                               </div>
-                              <span
-                                className={`text-xs font-bold ${
-                                  f.waiting === 0 ? 'text-[#0e8a8d]' : 'text-amber-700'
-                                }`}
-                              >
-                                {f.waiting === 0 ? '즉시입소' : `대기 ${f.waiting}명`}
+                              <span className="text-xs font-bold text-[#0e8a8d]">
+                                {f.score ? `${f.score}점` : f.ownership}
                               </span>
                             </div>
 
