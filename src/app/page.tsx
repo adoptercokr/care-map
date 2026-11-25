@@ -242,11 +242,11 @@ export default function HomePage() {
         activeTab === 'map' ? 'h-dvh overflow-hidden' : 'min-h-screen'
       } flex flex-col bg-slate-50`}
     >
-      {/* 상단 헤더 (본문 max-w-6xl 라인과 정확히 정렬) */}
-      <header className="h-16 bg-white border-b border-slate-200 sticky top-0 z-[450] shrink-0">
+      {/* 상단 헤더: 데스크톱 1줄 칼정렬 / 모바일은 로고+비교함 1줄 + 4등분 균등 탭 2줄(좌우 스크롤 0) */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-[450] shrink-0">
         <div
-          className={`h-full flex items-center justify-between ${
-            activeTab === 'map' ? 'px-4 sm:px-6' : 'max-w-6xl mx-auto px-5'
+          className={`h-14 md:h-16 flex items-center justify-between ${
+            activeTab === 'map' ? 'px-4 sm:px-6' : 'max-w-6xl mx-auto px-4 sm:px-5'
           }`}
         >
           <div className="flex items-center gap-6 sm:gap-10">
@@ -262,7 +262,7 @@ export default function HomePage() {
               </span>
             </button>
 
-            <nav className="flex items-center gap-5 sm:gap-7 overflow-x-auto">
+            <nav className="hidden md:flex items-center gap-7">
               {[
                 { id: 'map', label: '지도로 보기' },
                 { id: 'region', label: '지역별 찾기' },
@@ -274,7 +274,7 @@ export default function HomePage() {
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id as ActiveTab)}
-                    className={`h-16 border-b-2 text-[15px] sm:text-base font-semibold whitespace-nowrap shrink-0 transition ${
+                    className={`h-16 border-b-2 text-base font-semibold whitespace-nowrap shrink-0 transition ${
                       isActive
                         ? 'border-[#0e8a8d] text-[#0e8a8d]'
                         : 'border-transparent text-slate-500 hover:text-slate-900'
@@ -292,12 +292,37 @@ export default function HomePage() {
             className="h-9 px-3.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-sm font-semibold text-slate-800 flex items-center gap-2 shrink-0 whitespace-nowrap"
           >
             <Scale className="w-4 h-4 text-[#0e8a8d]" />
-            <span className="hidden sm:inline">비교함</span>
+            <span>비교함</span>
             <span className="px-1.5 py-0.5 rounded-full bg-[#0e8a8d] text-white text-xs font-bold">
               {compareList.length}
             </span>
           </button>
         </div>
+
+        {/* 모바일 전용 4등분 균등 탭바 (좌우 스크롤 없음) */}
+        <nav className="md:hidden grid grid-cols-4 border-t border-slate-100 bg-white">
+          {[
+            { id: 'map', label: '지도 보기' },
+            { id: 'region', label: '지역별' },
+            { id: 'calc', label: '비용계산' },
+            { id: 'guide', label: '가이드' },
+          ].map((item) => {
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id as ActiveTab)}
+                className={`h-10 text-xs font-bold border-b-2 transition ${
+                  isActive
+                    ? 'border-[#0e8a8d] text-[#0e8a8d] bg-[#eef8f8]/40'
+                    : 'border-transparent text-slate-600'
+                }`}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
       </header>
 
       {/* 1. 홈 (기본 화면) */}
@@ -320,7 +345,7 @@ export default function HomePage() {
       {activeTab === 'map' && (
         <main className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
           {/* 지도 전용 최상단 1줄 카테고리 & 필터 바 */}
-          <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3 shrink-0 overflow-x-auto">
+          <div className="bg-white border-b border-slate-200 px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3 shrink-0 overflow-x-auto no-scrollbar">
             <div className="flex items-center gap-1.5 shrink-0">
               {[
                 { id: 'all', label: '전체' },
