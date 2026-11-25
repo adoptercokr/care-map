@@ -59,12 +59,12 @@ const GRADE_PILL: Record<string, string> = {
 };
 
 const TYPE_ICON_BADGE: Record<string, { bg: string; icon: React.ComponentType<{ className?: string }> }> = {
-  nursing: { bg: 'bg-[#0e8a8d]', icon: Building2 },
-  daycare: { bg: 'bg-[#0284c7]', icon: Sun },
   hospital: { bg: 'bg-[#e11d48]', icon: Stethoscope },
-  silvertown: { bg: 'bg-[#6366f1]', icon: Home },
-  hospcare: { bg: 'bg-[#d97706]', icon: HeartHandshake },
+  nursing: { bg: 'bg-[#0e8a8d]', icon: Home },
+  daycare: { bg: 'bg-[#0284c7]', icon: Sun },
   homecare: { bg: 'bg-[#0d9488]', icon: UserCheck },
+  silvertown: { bg: 'bg-[#6366f1]', icon: Building2 },
+  hospcare: { bg: 'bg-[#d97706]', icon: HeartHandshake },
 };
 
 export default function HomePage() {

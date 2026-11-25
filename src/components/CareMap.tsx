@@ -5,7 +5,6 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Supercluster from 'supercluster';
 import { CareFacility } from '../types/care';
-import { getGradeLabel } from '../utils/gradeLabel';
 import { Crosshair, Plus, Minus, RotateCcw, Layers, RefreshCw } from 'lucide-react';
 
 export interface MapBounds {
@@ -78,10 +77,10 @@ export default function CareMap({
 
   const clusterIndex = useMemo(() => {
     const sc = new Supercluster<{ facility: CareFacility }>({
-      radius: 28,
-      maxZoom: 12,
+      radius: 56,
+      maxZoom: 15,
       minZoom: 5,
-      minPoints: 4,
+      minPoints: 3,
     });
     const points = facilities.map((f) => ({
       type: 'Feature' as const,
@@ -130,7 +129,7 @@ export default function CareMap({
 
         const marker = L.marker([lat, lng], { icon });
         marker.on('click', () => {
-          const nextZoom = Math.min(clusterIndex.getClusterExpansionZoom(props.cluster_id!), 14);
+          const nextZoom = Math.min(clusterIndex.getClusterExpansionZoom(props.cluster_id!), 16);
           map.setView([lat, lng], nextZoom, { animate: true });
         });
         marker.addTo(layerGroup);
@@ -138,7 +137,14 @@ export default function CareMap({
         const f = props.facility;
         const isSelected = selectedFacility?.id === f.id;
         const mStyle = TYPE_MARKER_STYLE[f.type] || TYPE_MARKER_STYLE.nursing;
-        const gradeBadge = f.type === 'hospital' ? '병원' : f.grade === 'NEW' ? getGradeLabel(f, true) : `${f.grade}`;
+        const shortTypeMap: Record<string, string> = {
+          hospital: '병원',
+          nursing: '요양',
+          daycare: '주간',
+          homecare: '방문',
+          silvertown: '실버',
+        };
+        const gradeBadge = f.grade !== 'NEW' ? `${f.grade}` : (shortTypeMap[f.type] || '시설');
 
         const icon = L.divIcon({
           className: 'care-pin-icon',
