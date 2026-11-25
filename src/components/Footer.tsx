@@ -39,10 +39,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="mt-6 pt-5 border-t border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
-            <div>
-              운영: MJ공작실 · 케어맵 | 문의: contact@caremap.kr
-            </div>
+          <div className="mt-6 pt-5 border-t border-slate-200/80 text-xs text-slate-500">
             <div>© {new Date().getFullYear()} CareMap. All rights reserved.</div>
           </div>
         </div>
