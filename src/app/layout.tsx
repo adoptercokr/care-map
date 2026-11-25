@@ -170,7 +170,19 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
         />
-      </head>
+            {/* Google Analytics 4 (GA4) */}
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-2N5V6S642H"></script>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-2N5V6S642H');
+          `,
+        }}
+      />
+  </head>
       <body className="bg-slate-50 text-slate-900 antialiased">{children}</body>
     </html>
   );
