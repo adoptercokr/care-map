@@ -78,9 +78,10 @@ export default function CareMap({
 
   const clusterIndex = useMemo(() => {
     const sc = new Supercluster<{ facility: CareFacility }>({
-      radius: 56,
-      maxZoom: 16,
+      radius: 28,
+      maxZoom: 12,
       minZoom: 5,
+      minPoints: 4,
     });
     const points = facilities.map((f) => ({
       type: 'Feature' as const,
@@ -129,7 +130,7 @@ export default function CareMap({
 
         const marker = L.marker([lat, lng], { icon });
         marker.on('click', () => {
-          const nextZoom = Math.min(clusterIndex.getClusterExpansionZoom(props.cluster_id!), 16);
+          const nextZoom = Math.min(clusterIndex.getClusterExpansionZoom(props.cluster_id!), 14);
           map.setView([lat, lng], nextZoom, { animate: true });
         });
         marker.addTo(layerGroup);
@@ -371,16 +372,14 @@ export default function CareMap({
       </div>
 
       {/* 좌하단 시설 유형 범례 */}
-      <div className="hidden sm:flex absolute left-3 bottom-4 z-[400] items-center gap-3 px-3.5 py-2 rounded-xl bg-white/95 backdrop-blur border border-slate-200 shadow-sm text-xs text-slate-700">
+      <div className="hidden sm:flex absolute left-3 bottom-4 z-[400] items-center gap-3.5 px-3.5 py-2 rounded-xl bg-white/95 backdrop-blur border border-slate-200 shadow-sm text-xs text-slate-700">
         {[
+          { key: 'hospital', label: '요양병원' },
           { key: 'nursing', label: '요양원' },
           { key: 'daycare', label: '주간보호' },
-          { key: 'hospital', label: '요양병원' },
-          { key: 'silvertown', label: '실버타운' },
-          { key: 'hospcare', label: '병원간병' },
           { key: 'homecare', label: '집간병' },
         ].map((item) => (
-          <span key={item.key} className="inline-flex items-center gap-1.5 font-medium">
+          <span key={item.key} className="inline-flex items-center gap-1.5 font-semibold">
             <span
               className="w-2.5 h-2.5 rounded-full inline-block"
               style={{ backgroundColor: TYPE_MARKER_STYLE[item.key].color }}

@@ -447,21 +447,37 @@ export default function HomePage() {
                   </button>
 
                   <div>
-                    <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                    <div className="flex flex-wrap items-center gap-2 mb-2.5">
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold border ${
+                        className={`px-3 py-1 rounded-lg text-sm font-extrabold ${
+                          selectedFacility.type === 'hospital'
+                            ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                            : selectedFacility.type === 'nursing'
+                            ? 'bg-[#eef8f8] text-[#0e8a8d] border border-[#cbe8e8]'
+                            : selectedFacility.type === 'daycare'
+                            ? 'bg-sky-50 text-sky-700 border border-sky-200'
+                            : 'bg-teal-50 text-teal-700 border border-teal-200'
+                        }`}
+                      >
+                        {selectedFacility.typeName}
+                      </span>
+                      <span
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
+                          selectedFacility.ownership === '국공립'
+                            ? 'bg-indigo-50 text-indigo-800 border border-indigo-200'
+                            : 'bg-slate-100 text-slate-700'
+                        }`}
+                      >
+                        {selectedFacility.ownership === '국공립' ? '국공립(정부·지자체)' : selectedFacility.ownership}
+                      </span>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold border ${
                           GRADE_PILL[selectedFacility.grade] || GRADE_PILL.NEW
                         }`}
                       >
                         <ShieldCheck className="w-3.5 h-3.5" />
                         {getGradeLabel(selectedFacility)}
                         {selectedFacility.score ? ` (${selectedFacility.score}점)` : ''}
-                      </span>
-                      <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-700">
-                        {selectedFacility.typeName}
-                      </span>
-                      <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-700">
-                        {selectedFacility.ownership === '국공립' ? '국공립(정부·지자체)' : selectedFacility.ownership}
                       </span>
                     </div>
                     <h2 className="text-xl font-extrabold text-slate-900 leading-snug">
@@ -618,15 +634,25 @@ export default function HomePage() {
                           </div>
 
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-2 mb-1">
-                              <div className="flex items-center gap-1.5">
-                                <span className={`px-2 py-0.5 rounded text-xs font-bold border ${gCls}`}>
-                                  {getGradeLabel(f, true)}
-                                </span>
-                                <span className="text-xs font-medium text-slate-500">{f.typeName}</span>
-                              </div>
-                              <span className="text-xs font-bold text-[#0e8a8d]">
-                                {f.score ? `${f.score}점` : f.ownership}
+                            <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                              <span
+                                className={`px-2.5 py-0.5 rounded-md text-[13px] font-extrabold ${
+                                  f.type === 'hospital'
+                                    ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                    : f.type === 'nursing'
+                                    ? 'bg-[#eef8f8] text-[#0e8a8d] border border-[#cbe8e8]'
+                                    : f.type === 'daycare'
+                                    ? 'bg-sky-50 text-sky-700 border border-sky-200'
+                                    : 'bg-teal-50 text-teal-700 border border-teal-200'
+                                }`}
+                              >
+                                {f.typeName}
+                              </span>
+                              <span className="text-xs font-bold text-slate-600">
+                                {f.ownership === '국공립' ? '국공립' : f.ownership}
+                              </span>
+                              <span className={`px-2 py-0.5 rounded text-xs font-bold border ${gCls}`}>
+                                {getGradeLabel(f, true)}
                               </span>
                             </div>
 
