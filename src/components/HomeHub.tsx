@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { CareFacility, FacilityType, ActiveTab } from '../types/care';
+import { getGradeLabel } from '../utils/gradeLabel';
 import {
   Search,
   MapPin,
@@ -46,26 +47,23 @@ const CATEGORIES: { id: CategoryFilter; label: string }[] = [
   { id: 'hospital', label: '요양병원' },
   { id: 'nursing', label: '요양원' },
   { id: 'daycare', label: '주간보호센터' },
-  { id: 'silvertown', label: '실버타운' },
   { id: 'homecare', label: '집간병·방문요양' },
+  { id: 'silvertown', label: '실버타운' },
 ];
 
 const GRADE_STYLE: Record<string, string> = {
   A: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+  '1': 'bg-emerald-50 text-emerald-800 border-emerald-200',
   B: 'bg-blue-50 text-blue-800 border-blue-200',
+  '2': 'bg-blue-50 text-blue-800 border-blue-200',
   C: 'bg-slate-100 text-slate-700 border-slate-200',
+  '3': 'bg-slate-100 text-slate-700 border-slate-200',
   D: 'bg-amber-50 text-amber-800 border-amber-200',
+  '4': 'bg-amber-50 text-amber-800 border-amber-200',
   E: 'bg-rose-50 text-rose-800 border-rose-200',
+  '5': 'bg-rose-50 text-rose-800 border-rose-200',
   NEW: 'bg-slate-100 text-slate-600 border-slate-200',
 };
-
-function getGradeLabel(f: CareFacility, short = false): string {
-  if (f.type === 'hospital') return short ? '병원' : '심평원 등록';
-  if (f.grade !== 'NEW') return short ? `${f.grade}등급` : `공단 ${f.grade}등급`;
-  const yr = parseInt((f.established || '').slice(0, 4), 10);
-  if (!isNaN(yr) && yr >= 2024) return short ? '신설' : '신설기관';
-  return short ? '미평가' : '평가 미실시';
-}
 
 export default function HomeHub({
   facilities,

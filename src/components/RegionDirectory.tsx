@@ -155,8 +155,8 @@ export default function RegionDirectory({
               <option value="hospital">요양병원</option>
               <option value="nursing">요양원</option>
               <option value="daycare">주간보호센터</option>
-              <option value="silvertown">실버타운</option>
               <option value="homecare">집간병·방문요양</option>
+              <option value="silvertown">실버타운</option>
             </select>
 
             <button
