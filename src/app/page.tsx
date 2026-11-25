@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { CareFacility, ActiveTab, FacilityType, EvalGrade } from '../types/care';
 import { getGradeLabel } from '../utils/gradeLabel';
+import { FACILITY_ICON_META } from '../utils/facilityIcons';
 import HomeHub from '../components/HomeHub';
 import RegionDirectory from '../components/RegionDirectory';
 import FacilityDetailSheet from '../components/FacilityDetailSheet';
@@ -619,8 +620,7 @@ export default function HomePage() {
                   ) : (
                     visibleMapFacilities.slice(0, 80).map((f) => {
                       const gCls = GRADE_PILL[f.grade] || GRADE_PILL.NEW;
-                      const iconMeta = TYPE_ICON_BADGE[f.type] || TYPE_ICON_BADGE.nursing;
-                      const TypeIcon = iconMeta.icon;
+                      const iconMeta = FACILITY_ICON_META[f.type] || FACILITY_ICON_META.nursing;
                       return (
                         <div
                           key={f.id}
@@ -631,10 +631,10 @@ export default function HomePage() {
                           className="p-4 cursor-pointer transition hover:bg-slate-50 flex gap-3.5"
                         >
                           <div
-                            className={`w-12 h-12 rounded-xl ${iconMeta.bg} text-white flex items-center justify-center shrink-0`}
-                          >
-                            <TypeIcon className="w-5 h-5" />
-                          </div>
+                            className="w-12 h-12 rounded-xl text-white flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: iconMeta.color }}
+                            dangerouslySetInnerHTML={{ __html: iconMeta.svg }}
+                          />
 
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
@@ -667,7 +667,9 @@ export default function HomePage() {
 
                             <div className="mt-2 flex items-center justify-between text-sm">
                               <span className="text-slate-500">
-                                {f.capacity ? `정원 ${f.capacity}명` : '재가/방문'} · {f.ownership}
+                                {f.type === 'hospital'
+                                  ? f.capacity ? `허가 ${f.capacity}병상` : '의료기관'
+                                  : f.capacity ? `정원 ${f.capacity}명` : '재가/방문'} · {f.ownership}
                               </span>
                               <span className="font-bold text-[#0e8a8d]">
                                 인력 {f.staffCare + f.staffNurse}명

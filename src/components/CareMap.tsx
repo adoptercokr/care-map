@@ -5,6 +5,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Supercluster from 'supercluster';
 import { CareFacility } from '../types/care';
+import { FACILITY_ICON_META } from '../utils/facilityIcons';
 import { Crosshair, Plus, Minus, RotateCcw, Layers, RefreshCw } from 'lucide-react';
 
 export interface MapBounds {
@@ -26,32 +27,7 @@ interface CareMapProps {
   targetCenter?: { lat: number; lng: number; zoom?: number; seq: number } | null;
 }
 
-const TYPE_MARKER_STYLE: Record<string, { color: string; svg: string }> = {
-  nursing: {
-    color: '#0e8a8d', // 요양원 (그린블루 + 집 아이콘)
-    svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
-  },
-  daycare: {
-    color: '#0284c7', // 주간보호 (스카이 블루 + 해 아이콘)
-    svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg>',
-  },
-  hospital: {
-    color: '#e11d48', // 요양병원 (로즈 레드 + 십자가 아이콘)
-    svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="white"><rect x="9.5" y="3" width="5" height="18" rx="1.5"/><rect x="3" y="9.5" width="18" height="5" rx="1.5"/></svg>',
-  },
-  silvertown: {
-    color: '#6366f1', // 실버타운 (인디고 + 빌딩 아이콘)
-    svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1"/></svg>',
-  },
-  hospcare: {
-    color: '#d97706', // 병원간병 (앰버 + 하트 아이콘)
-    svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
-  },
-  homecare: {
-    color: '#0d9488', // 집간병·방문요양 (틸 + 사람 아이콘)
-    svg: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.3"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>',
-  },
-};
+const TYPE_MARKER_STYLE = FACILITY_ICON_META;
 
 export default function CareMap({
   facilities,
