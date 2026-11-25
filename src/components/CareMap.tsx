@@ -360,7 +360,7 @@ export default function CareMap({
           { key: 'nursing', label: '요양원' },
           { key: 'daycare', label: '주간보호' },
           { key: 'homecare', label: '집간병' },
-          { key: 'silvertown', label: '실버타운' },
+          { key: 'silvertown', label: '실버타운·양로' },
         ].map((item) => (
           <span key={item.key} className="inline-flex items-center gap-1.5 font-semibold">
             <span

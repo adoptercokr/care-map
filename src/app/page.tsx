@@ -329,7 +329,7 @@ export default function HomePage() {
                 { id: 'nursing', label: '요양원' },
                 { id: 'daycare', label: '주간보호센터' },
                 { id: 'homecare', label: '집간병·방문요양' },
-                { id: 'silvertown', label: '실버타운' },
+                { id: 'silvertown', label: '실버타운·양로원' },
               ].map((t) => (
                 <button
                   key={t.id}

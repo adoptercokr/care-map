@@ -440,7 +440,7 @@ def main():
                     "id": f"SLV-{silver_added+1:05d}",
                     "name": name,
                     "type": "silvertown",
-                    "typeName": "실버타운",
+                    "typeName": "실버타운·양로원",
                     "ownership": map_ownership("", name),
                     "grade": "NEW",
                     "score": None,
