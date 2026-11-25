@@ -56,6 +56,7 @@ export default async function RegionPage({
   const countNursing = list.filter((f) => f.type === 'nursing').length;
   const countDaycare = list.filter((f) => f.type === 'daycare').length;
   const countPublic = list.filter((f) => f.ownership === '국공립').length;
+  const sigungus = Array.from(new Set(list.map((f) => f.sigungu).filter(Boolean))).sort();
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
@@ -103,6 +104,24 @@ export default async function RegionPage({
             </Link>
           ))}
         </div>
+
+        {/* 시·군·구 하위 페이지 링크 (내부 SEO 크롤링 연결) */}
+        {sigungus.length > 0 && (
+          <div className="mb-8 p-4 rounded-2xl bg-white border border-slate-200">
+            <div className="text-xs font-bold text-slate-500 mb-2.5">{sido} 시·군·구별 바로가기</div>
+            <div className="flex flex-wrap gap-1.5">
+              {sigungus.map((sg) => (
+                <Link
+                  key={sg}
+                  href={`/region/${encodeURIComponent(sido)}/${encodeURIComponent(sg)}`}
+                  className="px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-slate-50 text-slate-700 border border-slate-200 hover:border-[#0e8a8d] hover:text-[#0e8a8d] transition"
+                >
+                  {sg}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* 정적 SEO용 주요 시설 리스트 */}
         <div className="space-y-3">

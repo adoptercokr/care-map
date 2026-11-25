@@ -26,3 +26,6 @@ next-env.d.ts
 # local raw data & scratch
 /data/raw/
 /scratch/
+
+.vercel
+.env*
