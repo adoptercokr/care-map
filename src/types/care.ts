@@ -7,7 +7,7 @@ export type FacilityType =
   | 'homecare';
 
 export type EvalGrade = 'A' | 'B' | 'C' | 'D' | 'E' | 'NEW';
-export type OwnershipType = '공립' | '법인' | '개인';
+export type OwnershipType = '국공립' | '법인사업자' | '개인사업자';
 export type ActiveTab = 'home' | 'map' | 'region' | 'calc' | 'guide';
 
 export interface CareFacility {
@@ -26,14 +26,8 @@ export interface CareFacility {
   lng: number;
   tel: string;
   capacity: number | null;
-  current: number | null;
-  waiting: number | null;
   staffCare: number;
   staffNurse: number;
-  mealCost: number | null;
-  room1Cost: number | null;
-  room2Cost: number | null;
-  monthlyBaseEstimate: number | null;
   established: string;
   tags: string[];
 }

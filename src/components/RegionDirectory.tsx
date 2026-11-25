@@ -48,8 +48,6 @@ export default function RegionDirectory({
   // 세부 조건 토글
   const [onlyGradeA, setOnlyGradeA] = useState(false);
   const [onlyPublic, setOnlyPublic] = useState(false);
-  const [onlySingleRoom, setOnlySingleRoom] = useState(false);
-  const [onlyNoWait, setOnlyNoWait] = useState(false);
   const [displayLimit, setDisplayLimit] = useState(50);
 
   const sigunguList = useMemo(() => {
@@ -69,9 +67,7 @@ export default function RegionDirectory({
       if (selectedSigungu !== '전체' && f.sigungu !== selectedSigungu) return false;
       if (selectedType !== 'all' && f.type !== selectedType) return false;
       if (onlyGradeA && f.grade !== 'A') return false;
-      if (onlyPublic && f.ownership !== '공립') return false;
-      if (onlySingleRoom && (!f.room1Cost || f.room1Cost <= 0)) return false;
-      if (onlyNoWait && f.waiting !== null && f.waiting > 0) return false;
+      if (onlyPublic && f.ownership !== '국공립') return false;
       if (q && !f.name.toLowerCase().includes(q) && !f.addr.toLowerCase().includes(q)) return false;
       return true;
     });
@@ -82,8 +78,6 @@ export default function RegionDirectory({
     selectedType,
     onlyGradeA,
     onlyPublic,
-    onlySingleRoom,
-    onlyNoWait,
     keyword,
   ]);
 
@@ -94,7 +88,7 @@ export default function RegionDirectory({
           지역별 요양시설 상세 검색
         </h1>
         <p className="mt-1.5 text-[15px] sm:text-base text-slate-600">
-          시·도 및 시·군·구를 선택하고, 공립·A등급·1인실·입소 대기 여부를 조건별로 바로 걸러보세요.
+          시·도 및 시·군·구를 선택하고, 국공립(정부·지자체)·요양병원·A등급 시설을 조건별로 바로 걸러보세요.
         </p>
       </div>
 
@@ -161,10 +155,8 @@ export default function RegionDirectory({
             </select>
 
             {[
-              { label: '공립(국공립)', active: onlyPublic, toggle: () => setOnlyPublic(!onlyPublic) },
+              { label: '국공립(정부·지자체)', active: onlyPublic, toggle: () => setOnlyPublic(!onlyPublic) },
               { label: 'A등급 최우수', active: onlyGradeA, toggle: () => setOnlyGradeA(!onlyGradeA) },
-              { label: '1인실 있음', active: onlySingleRoom, toggle: () => setOnlySingleRoom(!onlySingleRoom) },
-              { label: '대기 없음', active: onlyNoWait, toggle: () => setOnlyNoWait(!onlyNoWait) },
             ].map((chip) => (
               <button
                 key={chip.label}
@@ -235,19 +227,14 @@ export default function RegionDirectory({
                       </span>
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold ${
-                          f.ownership === '공립'
+                          f.ownership === '국공립'
                             ? 'bg-indigo-50 text-indigo-800 border border-indigo-200'
                             : 'bg-slate-50 text-slate-600 border border-slate-200'
                         }`}
                       >
                         <Building2 className="w-3 h-3" />
-                        {f.ownership}
+                        {f.ownership === '국공립' ? '국공립(정부·지자체)' : f.ownership}
                       </span>
-                      {f.room1Cost && f.room1Cost > 0 ? (
-                        <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200">
-                          1인실 운영
-                        </span>
-                      ) : null}
                     </div>
 
                     <h3 className="text-lg sm:text-xl font-extrabold text-[#191f28]">{f.name}</h3>
@@ -282,16 +269,15 @@ export default function RegionDirectory({
                   {/* 중앙: 세부 지표 박스 (실제 수집 데이터만 표기) */}
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 lg:w-[430px] shrink-0">
                     <div className="p-2.5 rounded-xl bg-[#f7f8fa]">
-                      <div className="text-[11px] text-slate-500">
-                        {f.current !== null ? '정원 / 현원' : '입소 정원'}
-                      </div>
+                      <div className="text-[11px] text-slate-500">입소 정원</div>
                       <div className="mt-0.5 text-sm font-bold text-slate-900">
-                        {f.capacity ? `${f.capacity}명` : '재가/방문'}
-                        {f.current !== null ? ` / ${f.current}명` : ''}
+                        {f.capacity ? `${f.capacity}명` : f.type === 'hospital' ? '요양병원' : '재가/방문'}
                       </div>
                     </div>
                     <div className="p-2.5 rounded-xl bg-[#f7f8fa]">
-                      <div className="text-[11px] text-slate-500">돌봄 인력</div>
+                      <div className="text-[11px] text-slate-500">
+                        {f.type === 'hospital' ? '의사 인력' : '돌봄 인력'}
+                      </div>
                       <div className="mt-0.5 text-sm font-bold text-slate-900">
                         {f.staffCare + f.staffNurse}명
                       </div>
@@ -305,7 +291,7 @@ export default function RegionDirectory({
                     <div className="col-span-3 sm:col-span-1 p-2.5 rounded-xl bg-[#eef8f8] border border-[#cbe8e8]">
                       <div className="text-[11px] text-slate-600">설립 / 지정</div>
                       <div className="mt-0.5 text-sm font-extrabold text-[#0e8a8d]">
-                        {f.established.slice(0, 4)}년
+                        {f.established ? `${f.established.slice(0, 4)}년` : '-'}
                       </div>
                     </div>
                   </div>

@@ -108,14 +108,16 @@ def load_region_lookup() -> tuple[dict[str, tuple[float, float]], dict[str, tupl
     return dong_map, sigungu_map
 
 
-def map_ownership(raw: str) -> str:
-    if not raw:
-        return "개인"
-    if "지자체" in raw or "지방자치" in raw or "공립" in raw or "국공립" in raw:
-        return "공립"
-    if "법인" in raw:
-        return "법인"
-    return "개인"
+def map_ownership(raw: str, name: str = "") -> str:
+    if raw and ("지자체" in raw or "지방자치" in raw or "공립" in raw or "국공립" in raw):
+        return "국공립"
+    if any(k in name for k in ("국립", "시립", "도립", "군립", "구립", "서울특별시립", "건강보험공단")):
+        return "국공립"
+    if raw and "법인" in raw:
+        return "법인사업자"
+    if any(k in name for k in ("의료법인", "사회복지법인", "재단법인", "(의)", "(재)", "(사)")):
+        return "법인사업자"
+    return "개인사업자"
 
 
 def classify_type(tcode: str, tname: str, name: str) -> tuple[str, str, int]:
@@ -163,7 +165,7 @@ def main():
                 "score": score,
                 "evalYear": dt[:4] if dt else "2024",
                 "evalDate": dt,
-                "ownership": map_ownership(row.get("설립주체", "")),
+                "ownership": map_ownership(row.get("설립주체", ""), row.get("장기요양기관명", "")),
             }
 
     wb = openpyxl.load_workbook(RAW_DIR / "facilities_status.xlsx", read_only=True)
@@ -246,7 +248,7 @@ def main():
         grade = ev["grade"] if ev else "NEW"
         score = ev["score"] if ev else None
         eval_year = ev["evalYear"] if ev else ""
-        ownership = ev["ownership"] if ev else ("공립" if ("구립" in name or "시립" in name or "군립" in name or "도립" in name) else "개인")
+        ownership = ev["ownership"] if ev else map_ownership("", name)
 
         addr = str(r[9] or area_str).strip()
         est = str(r[7] or "").strip()
@@ -268,14 +270,8 @@ def main():
             "lng": round(coords[1] + dlng, 6),
             "tel": "",
             "capacity": cap,
-            "current": cur,
-            "waiting": None,
             "staffCare": st["care"],
             "staffNurse": st["nurse"],
-            "mealCost": None,
-            "room1Cost": None,
-            "room2Cost": None,
-            "monthlyBaseEstimate": None,
             "established": est_fmt,
             "tags": [ftype_name, ownership],
         })
@@ -309,7 +305,7 @@ def main():
                     "name": name,
                     "type": "hospital",
                     "typeName": "요양병원",
-                    "ownership": "법인" if ("의료법인" in name or "재단" in name or "(의)" in name) else ("공립" if ("시립" in name or "도립" in name or "군립" in name) else "개인"),
+                    "ownership": map_ownership("", name),
                     "grade": "NEW",
                     "score": None,
                     "evalYear": "",
@@ -320,18 +316,24 @@ def main():
                     "lng": round(lng, 6),
                     "tel": tel,
                     "capacity": None,
-                    "current": None,
-                    "waiting": None,
                     "staffCare": 0,
                     "staffNurse": docs,
-                    "mealCost": None,
-                    "room1Cost": None,
-                    "room2Cost": None,
-                    "monthlyBaseEstimate": None,
                     "established": est_fmt,
                     "tags": ["요양병원", "심평원등록"],
                 })
                 hira_added += 1
+
+    # 우선순위 정렬: 1) 국공립(정부·지자체) 2) 요양병원 3) A~B등급 요양원/주간보호 4) 기타
+    grade_rank = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "NEW": 5}
+    type_rank = {"hospital": 1, "nursing": 2, "daycare": 3, "homecare": 4}
+    facilities.sort(
+        key=lambda x: (
+            0 if x["ownership"] == "국공립" else 1,
+            type_rank.get(x["type"], 5),
+            grade_rank.get(x["grade"], 5),
+            -(x["score"] or 0),
+        )
+    )
 
     OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(OUT_FILE, "w", encoding="utf-8") as f:

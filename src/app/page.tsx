@@ -460,13 +460,8 @@ export default function HomePage() {
                         {selectedFacility.typeName}
                       </span>
                       <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-700">
-                        {selectedFacility.ownership}
+                        {selectedFacility.ownership === '국공립' ? '국공립(정부·지자체)' : selectedFacility.ownership}
                       </span>
-                      {selectedFacility.room1Cost && selectedFacility.room1Cost > 0 ? (
-                        <span className="px-2 py-0.5 rounded-md text-xs font-bold bg-[#eef8f8] text-[#0e8a8d] border border-[#cbe8e8]">
-                          1인실
-                        </span>
-                      ) : null}
                     </div>
                     <h2 className="text-xl font-extrabold text-slate-900 leading-snug">
                       {selectedFacility.name}
@@ -495,12 +490,9 @@ export default function HomePage() {
 
                   <div className="grid grid-cols-3 gap-2">
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <div className="text-xs text-slate-500">
-                        {selectedFacility.current !== null ? '정원 / 현원' : '입소 정원'}
-                      </div>
+                      <div className="text-xs text-slate-500">입소 정원</div>
                       <div className="mt-1 text-base font-bold text-slate-900">
-                        {selectedFacility.capacity ? `${selectedFacility.capacity}명` : '재가/방문'}
-                        {selectedFacility.current !== null ? ` / ${selectedFacility.current}명` : ''}
+                        {selectedFacility.capacity ? `${selectedFacility.capacity}명` : selectedFacility.type === 'hospital' ? '요양병원' : '재가/방문'}
                       </div>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
@@ -510,7 +502,9 @@ export default function HomePage() {
                       </div>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <div className="text-xs text-slate-500">돌봄 인력</div>
+                      <div className="text-xs text-slate-500">
+                        {selectedFacility.type === 'hospital' ? '의사 인력' : '돌봄 인력'}
+                      </div>
                       <div className="mt-1 text-base font-bold text-slate-900">
                         {selectedFacility.staffCare + selectedFacility.staffNurse}명
                       </div>
