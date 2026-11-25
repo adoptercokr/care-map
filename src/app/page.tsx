@@ -312,7 +312,7 @@ export default function HomePage() {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id as ActiveTab)}
-                className={`h-10 text-xs font-bold border-b-2 transition ${
+                className={`h-11 text-[15px] font-bold whitespace-nowrap border-b-2 transition ${
                   isActive
                     ? 'border-[#0e8a8d] text-[#0e8a8d] bg-[#eef8f8]/40'
                     : 'border-transparent text-slate-600'
