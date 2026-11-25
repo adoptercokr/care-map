@@ -257,13 +257,23 @@ export default function RegionDirectory({
                         <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
                         {f.addr}
                       </span>
-                      {f.tel && (
+                      {f.tel ? (
                         <a
                           href={`tel:${f.tel.replace(/[^0-9+]/g, '')}`}
-                          className="inline-flex items-center gap-1 font-semibold text-teal-700 hover:underline"
+                          className="inline-flex items-center gap-1 font-semibold text-[#0e8a8d] hover:underline"
                         >
                           <Phone className="w-4 h-4 shrink-0" />
                           {f.tel}
+                        </a>
+                      ) : (
+                        <a
+                          href={`https://map.naver.com/p/search/${encodeURIComponent(f.name + ' ' + f.sigungu)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-[#0e8a8d] hover:underline"
+                        >
+                          <Phone className="w-3.5 h-3.5 shrink-0" />
+                          전화·상세정보(네이버 지도)
                         </a>
                       )}
                     </div>
@@ -272,7 +282,9 @@ export default function RegionDirectory({
                   {/* 중앙: 세부 지표 박스 (실제 수집 데이터만 표기) */}
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 lg:w-[430px] shrink-0">
                     <div className="p-2.5 rounded-xl bg-[#f7f8fa]">
-                      <div className="text-[11px] text-slate-500">정원 / 현원</div>
+                      <div className="text-[11px] text-slate-500">
+                        {f.current !== null ? '정원 / 현원' : '입소 정원'}
+                      </div>
                       <div className="mt-0.5 text-sm font-bold text-slate-900">
                         {f.capacity ? `${f.capacity}명` : '재가/방문'}
                         {f.current !== null ? ` / ${f.current}명` : ''}

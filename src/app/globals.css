@@ -34,6 +34,10 @@ body {
   background: #eef2f6;
 }
 
+/* VWorld 타일 간 1px 바둑판 흰 선(서브픽셀 틈새) 완전 제거 */
 .leaflet-tile-container img {
+  width: 256.5px !important;
+  height: 256.5px !important;
+  margin: -0.25px !important;
   outline: 1px solid transparent;
 }

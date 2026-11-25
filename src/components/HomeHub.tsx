@@ -442,7 +442,9 @@ export default function HomeHub({
 
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 lg:w-[420px] shrink-0">
                   <div className="p-2.5 rounded-xl bg-[#f7f8fa]">
-                    <div className="text-[11px] text-slate-500">정원 / 현원</div>
+                    <div className="text-[11px] text-slate-500">
+                      {f.current !== null ? '정원 / 현원' : '입소 정원'}
+                    </div>
                     <div className="mt-0.5 text-sm font-bold text-slate-900">
                       {f.capacity ? `${f.capacity}명` : '재가/방문'}
                       {f.current !== null ? ` / ${f.current}명` : ''}

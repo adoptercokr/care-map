@@ -495,7 +495,9 @@ export default function HomePage() {
 
                   <div className="grid grid-cols-3 gap-2">
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <div className="text-xs text-slate-500">정원 / 현원</div>
+                      <div className="text-xs text-slate-500">
+                        {selectedFacility.current !== null ? '정원 / 현원' : '입소 정원'}
+                      </div>
                       <div className="mt-1 text-base font-bold text-slate-900">
                         {selectedFacility.capacity ? `${selectedFacility.capacity}명` : '재가/방문'}
                         {selectedFacility.current !== null ? ` / ${selectedFacility.current}명` : ''}

@@ -21,6 +21,24 @@ OUT_FILE = BASE_DIR / "public" / "data" / "facilities.json"
 REGIONS_URL = "https://raw.githubusercontent.com/swuhalee/korea-regions-with-coords/main/korea-regions-with-coords.json"
 
 
+SIDO_AREA_CODE = {
+    "서울": "02", "부산": "051", "대구": "053", "인천": "032",
+    "광주": "062", "대전": "042", "울산": "052", "세종": "044",
+    "경기": "031", "강원": "033", "충북": "043", "충남": "041",
+    "전북": "063", "전남": "061", "경북": "054", "경남": "055", "제주": "064",
+}
+
+
+def normalize_tel(raw_tel: str, sido: str) -> str:
+    t = (raw_tel or "").strip()
+    if not t:
+        return ""
+    if t.startswith("0") or t.startswith("15") or t.startswith("16") or t.startswith("18"):
+        return t
+    area = SIDO_AREA_CODE.get(sido, "")
+    return f"{area}-{t}" if area else t
+
+
 def short_sido(full_sido: str) -> str:
     s = full_sido.strip()
     mapping = {
@@ -281,6 +299,7 @@ def main():
                 if not name or lat < 32 or lng < 124:
                     continue
                 sido = short_sido((row.get("시도코드명") or "").strip())
+                tel = normalize_tel(tel, sido)
                 sigungu = (row.get("시군구코드명") or "").strip()
                 est_raw = (row.get("개설일자") or "").strip()
                 est_fmt = f"{est_raw[:4]}-{est_raw[4:6]}-{est_raw[6:8]}" if len(est_raw) >= 8 else est_raw
