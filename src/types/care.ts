@@ -6,7 +6,7 @@ export type FacilityType =
   | 'hospcare'
   | 'homecare';
 
-export type EvalGrade = 'A' | 'B' | 'C' | 'D' | 'E' | 'NEW';
+export type EvalGrade = 'A' | 'B' | 'C' | 'D' | 'E' | '1' | '2' | '3' | '4' | '5' | 'NEW';
 export type OwnershipType = '국공립' | '법인사업자' | '개인사업자';
 export type ActiveTab = 'home' | 'map' | 'region' | 'calc' | 'guide';
 

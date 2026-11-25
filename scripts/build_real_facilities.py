@@ -299,7 +299,25 @@ def main():
             "tags": [ftype_name, ownership],
         })
 
-    # 4. 건강보험심사평가원 전국 요양병원(전화번호·정밀좌표·실제 병상수·직종별 의사수 포함) 병합
+    # 4. 건강보험심사평가원 요양병원 적정성 평가(1~5등급) 로드
+    hosp_eval_map: dict[str, str] = {}
+    hosp_eval_file = RAW_DIR / "hira" / "hospital_eval.xlsx"
+    if hosp_eval_file.exists():
+        wb_ev = openpyxl.load_workbook(hosp_eval_file, read_only=True)
+        ws_ev = wb_ev.active
+        for i, r in enumerate(ws_ev.iter_rows(values_only=True)):
+            if i == 0 or not r[1]:
+                continue
+            hname = str(r[1]).replace(" ", "").strip()
+            hgrade_raw = str(r[3] or "").strip()
+            htel = str(r[5] or "").strip()
+            g = hgrade_raw[0] if hgrade_raw and hgrade_raw[0] in ("1", "2", "3", "4", "5") else "NEW"
+            if g != "NEW":
+                if htel:
+                    hosp_eval_map[htel] = g
+                hosp_eval_map[hname] = g
+
+    # 5. 건강보험심사평가원 전국 요양병원(전화번호·정밀좌표·실제 병상수·직종별 의사수·적정성 평가등급 포함) 병합
     beds_map: dict[str, dict] = {}
     beds_file = RAW_DIR / "hira" / "facility_beds.csv"
     if beds_file.exists():
@@ -363,15 +381,16 @@ def main():
                 doc_detail = " · ".join(d_parts) if d_parts else (f"총 의사 {docs}명" if docs else "")
 
                 binfo = beds_map.get(key, {})
+                h_grade = hosp_eval_map.get(tel) or hosp_eval_map.get(name.replace(" ", "")) or "NEW"
                 facilities.append({
                     "id": f"HIRA-{hira_added+1:05d}",
                     "name": name,
                     "type": "hospital",
                     "typeName": "요양병원",
                     "ownership": map_ownership(binfo.get("owner", ""), name),
-                    "grade": "NEW",
+                    "grade": h_grade,
                     "score": None,
-                    "evalYear": "",
+                    "evalYear": "2023" if h_grade != "NEW" else "",
                     "addr": addr,
                     "sido": sido,
                     "sigungu": sigungu,
@@ -387,9 +406,63 @@ def main():
                 })
                 hira_added += 1
 
-    # 우선순위 정렬: 1) 국공립(정부·지자체) 2) 요양병원 3) A~B등급 요양원/주간보호 4) 기타
-    grade_rank = {"A": 0, "B": 1, "C": 2, "D": 3, "E": 4, "NEW": 5}
-    type_rank = {"hospital": 1, "nursing": 2, "daycare": 3, "homecare": 4}
+    # 6. 보건복지부 노인주거복지시설(실버타운: 노인복지주택 + 양로시설) 병합
+    welfare_file = RAW_DIR / "welfare_facilities.csv"
+    silver_added = 0
+    if welfare_file.exists():
+        import re
+        with open(welfare_file, "r", encoding="cp949", errors="replace") as f:
+            for row in csv.DictReader(f):
+                kind = (row.get("시설종류") or "").strip()
+                if kind not in ("노인복지주택", "양로시설"):
+                    continue
+                name = (row.get("시설명") or "").strip()
+                addr = (row.get("시설주소") or "").strip()
+                if not name or not addr:
+                    continue
+                aparts = addr.split()
+                if len(aparts) < 2:
+                    continue
+                sido = short_sido(aparts[0])
+                sigungu = aparts[1]
+                # 괄호 안 법정동 추출 (예: "(평창동)")
+                m = re.search(r"\(([^)]+)\)", addr)
+                dong_in_paren = m.group(1).split(",")[0].strip() if m else ""
+                coords = (
+                    (dong_map.get(f"{sido} {sigungu} {dong_in_paren}") if dong_in_paren else None)
+                    or sigungu_map.get(f"{sido} {aparts[1]} {aparts[2]}" if len(aparts) >= 3 else "")
+                    or sigungu_map.get(f"{sido} {sigungu}")
+                )
+                if not coords:
+                    continue
+                dlat, dlng = deterministic_jitter(f"SLV-{silver_added}-{name}")
+                facilities.append({
+                    "id": f"SLV-{silver_added+1:05d}",
+                    "name": name,
+                    "type": "silvertown",
+                    "typeName": "실버타운",
+                    "ownership": map_ownership("", name),
+                    "grade": "NEW",
+                    "score": None,
+                    "evalYear": "",
+                    "addr": addr,
+                    "sido": sido,
+                    "sigungu": sigungu,
+                    "lat": round(coords[0] + dlat, 6),
+                    "lng": round(coords[1] + dlng, 6),
+                    "tel": "",
+                    "capacity": None,
+                    "staffCare": 0,
+                    "staffNurse": 0,
+                    "staffDetail": kind,
+                    "established": "",
+                    "tags": ["실버타운", kind],
+                })
+                silver_added += 1
+
+    # 우선순위 정렬: 1) 국공립(정부·지자체) 2) 요양병원 3) 요양원/주간보호/실버타운 4) 기타
+    grade_rank = {"1": 0, "A": 0, "2": 1, "B": 1, "3": 2, "C": 2, "4": 3, "D": 3, "5": 4, "E": 4, "NEW": 5}
+    type_rank = {"hospital": 1, "nursing": 2, "daycare": 3, "silvertown": 4, "homecare": 5}
     facilities.sort(
         key=lambda x: (
             0 if x["ownership"] == "국공립" else 1,
@@ -403,7 +476,7 @@ def main():
     with open(OUT_FILE, "w", encoding="utf-8") as f:
         json.dump(facilities, f, ensure_ascii=False, separators=(",", ":"))
 
-    print(f"[DONE] Saved {len(facilities)} real facilities (HIRA hospitals={hira_added}, unmatched={unmatched}) -> {OUT_FILE}")
+    print(f"[DONE] Saved {len(facilities)} real facilities (HIRA hospitals={hira_added}, silvertowns={silver_added}, unmatched={unmatched}) -> {OUT_FILE}")
 
 
 if __name__ == "__main__":

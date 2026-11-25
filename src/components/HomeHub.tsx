@@ -35,7 +35,7 @@ interface HomeHubProps {
 
 const REGION_BUTTONS = [
   '전체', '서울', '경기', '인천', '부산', '대구', '대전', '광주', '울산', '세종',
-  '강원', '충남', '전북', '경남', '제주',
+  '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주',
 ];
 
 type CategoryFilter = 'all' | 'public' | FacilityType;
@@ -46,6 +46,7 @@ const CATEGORIES: { id: CategoryFilter; label: string }[] = [
   { id: 'hospital', label: '요양병원' },
   { id: 'nursing', label: '요양원' },
   { id: 'daycare', label: '주간보호센터' },
+  { id: 'silvertown', label: '실버타운' },
   { id: 'homecare', label: '집간병·방문요양' },
 ];
 

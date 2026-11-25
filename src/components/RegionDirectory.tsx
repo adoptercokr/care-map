@@ -23,7 +23,7 @@ interface RegionDirectoryProps {
 
 const SIDO_TABS = [
   '전체', '서울', '경기', '인천', '부산', '대구', '대전', '광주', '울산', '세종',
-  '강원', '충남', '전북', '경남', '제주',
+  '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주',
 ];
 
 const GRADE_STYLE: Record<string, string> = {
@@ -47,7 +47,7 @@ export default function RegionDirectory({
   const [keyword, setKeyword] = useState('');
 
   // 세부 조건 토글
-  const [onlyGradeA, setOnlyGradeA] = useState(false);
+  const [gradeFilter, setGradeFilter] = useState<'all' | 'A' | 'B' | 'C' | 'DE'>('all');
   const [onlyPublic, setOnlyPublic] = useState(false);
   const [displayLimit, setDisplayLimit] = useState(50);
 
@@ -67,7 +67,10 @@ export default function RegionDirectory({
       if (selectedSido !== '전체' && !f.sido.startsWith(selectedSido)) return false;
       if (selectedSigungu !== '전체' && f.sigungu !== selectedSigungu) return false;
       if (selectedType !== 'all' && f.type !== selectedType) return false;
-      if (onlyGradeA && f.grade !== 'A') return false;
+      if (gradeFilter === 'A' && f.grade !== 'A' && f.grade !== '1') return false;
+      if (gradeFilter === 'B' && f.grade !== 'B' && f.grade !== '2') return false;
+      if (gradeFilter === 'C' && f.grade !== 'C' && f.grade !== '3') return false;
+      if (gradeFilter === 'DE' && !['D', 'E', '4', '5'].includes(f.grade)) return false;
       if (onlyPublic && f.ownership !== '국공립') return false;
       if (q && !f.name.toLowerCase().includes(q) && !f.addr.toLowerCase().includes(q)) return false;
       return true;
@@ -77,7 +80,7 @@ export default function RegionDirectory({
     selectedSido,
     selectedSigungu,
     selectedType,
-    onlyGradeA,
+    gradeFilter,
     onlyPublic,
     keyword,
   ]);
@@ -152,25 +155,42 @@ export default function RegionDirectory({
               <option value="hospital">요양병원</option>
               <option value="nursing">요양원</option>
               <option value="daycare">주간보호센터</option>
+              <option value="silvertown">실버타운</option>
               <option value="homecare">집간병·방문요양</option>
             </select>
 
-            {[
-              { label: '국공립(정부·지자체)', active: onlyPublic, toggle: () => setOnlyPublic(!onlyPublic) },
-              { label: 'A등급 최우수', active: onlyGradeA, toggle: () => setOnlyGradeA(!onlyGradeA) },
-            ].map((chip) => (
-              <button
-                key={chip.label}
-                onClick={chip.toggle}
-                className={`h-10 px-3.5 rounded-xl text-sm font-semibold border transition ${
-                  chip.active
-                    ? 'bg-teal-50 text-teal-800 border-teal-600'
-                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-                }`}
-              >
-                {chip.active ? `✓ ${chip.label}` : chip.label}
-              </button>
-            ))}
+            <button
+              onClick={() => setOnlyPublic(!onlyPublic)}
+              className={`h-10 px-3.5 rounded-xl text-sm font-semibold border transition ${
+                onlyPublic
+                  ? 'bg-[#eef8f8] text-[#0e8a8d] border-[#0e8a8d]'
+                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+              }`}
+            >
+              {onlyPublic ? '✓ 국공립(정부·지자체)' : '국공립(정부·지자체)'}
+            </button>
+
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+              {[
+                { id: 'all', label: '전체 등급' },
+                { id: 'A', label: '최우수 (A / 1등급)' },
+                { id: 'B', label: '우수 (B / 2등급)' },
+                { id: 'C', label: '양호 (C / 3등급)' },
+                { id: 'DE', label: '보통·미흡 (D·E / 4·5등급)' },
+              ].map((g) => (
+                <button
+                  key={g.id}
+                  onClick={() => setGradeFilter(g.id as 'all' | 'A' | 'B' | 'C' | 'DE')}
+                  className={`h-8 px-2.5 rounded-lg text-xs sm:text-sm font-semibold transition ${
+                    gradeFilter === g.id
+                      ? 'bg-white text-[#0e8a8d] shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="relative w-full lg:w-64">
