@@ -27,7 +27,7 @@ interface HomeHubProps {
   facilities: CareFacility[];
   compareIds: string[];
   onToggleCompare: (facility: CareFacility) => void;
-  onGoToMap: (typeFilter?: 'all' | FacilityType, query?: string) => void;
+  onGoToMap: (typeFilter?: 'all' | 'public' | FacilityType, query?: string) => void;
   onGoToRegion: (sido?: string) => void;
   onSelectFacilityOnMap: (facility: CareFacility) => void;
   onChangeTab: (tab: ActiveTab) => void;
@@ -38,11 +38,14 @@ const REGION_BUTTONS = [
   '강원', '충남', '전북', '경남', '제주',
 ];
 
-const CATEGORIES: { id: 'all' | FacilityType; label: string }[] = [
+type CategoryFilter = 'all' | 'public' | FacilityType;
+
+const CATEGORIES: { id: CategoryFilter; label: string }[] = [
   { id: 'all', label: '전체' },
+  { id: 'public', label: '국공립(정부·지자체)' },
+  { id: 'hospital', label: '요양병원' },
   { id: 'nursing', label: '요양원' },
   { id: 'daycare', label: '주간보호센터' },
-  { id: 'hospital', label: '요양병원' },
   { id: 'homecare', label: '집간병·방문요양' },
 ];
 
@@ -65,19 +68,25 @@ export default function HomeHub({
   onChangeTab,
 }: HomeHubProps) {
   const [heroQuery, setHeroQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<'all' | FacilityType>('all');
+  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
   const [selectedRegion, setSelectedRegion] = useState('전체');
   const [previewSelected, setPreviewSelected] = useState<CareFacility | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
+  const matchesCategory = (f: CareFacility) => {
+    if (selectedCategory === 'all') return true;
+    if (selectedCategory === 'public') return f.ownership === '국공립';
+    return f.type === selectedCategory;
+  };
+
   const regionFiltered = facilities.filter((f) => {
-    if (selectedCategory !== 'all' && f.type !== selectedCategory) return false;
+    if (!matchesCategory(f)) return false;
     if (selectedRegion !== '전체' && !f.sido.startsWith(selectedRegion)) return false;
     return true;
   });
 
   const filtered = facilities.filter((f) => {
-    if (selectedCategory !== 'all' && f.type !== selectedCategory) return false;
+    if (!matchesCategory(f)) return false;
     const q = heroQuery.trim().toLowerCase();
     if (q && !f.name.toLowerCase().includes(q) && !f.addr.toLowerCase().includes(q) && !f.sigungu.toLowerCase().includes(q)) {
       return false;

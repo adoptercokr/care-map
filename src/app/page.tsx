@@ -74,7 +74,7 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [appliedQuery, setAppliedQuery] = useState('');
   const [searchedPlaceLabel, setSearchedPlaceLabel] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | FacilityType>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'public' | FacilityType>('all');
   const [gradeFilter, setGradeFilter] = useState<'all' | EvalGrade>('all');
   const [sidoFilter, setSidoFilter] = useState('전체');
 
@@ -106,7 +106,8 @@ export default function HomePage() {
   const filteredFacilities = useMemo(() => {
     const q = appliedQuery.trim().toLowerCase();
     return facilities.filter((f) => {
-      if (typeFilter !== 'all' && f.type !== typeFilter) return false;
+      if (typeFilter === 'public' && f.ownership !== '국공립') return false;
+      if (typeFilter !== 'all' && typeFilter !== 'public' && f.type !== typeFilter) return false;
       if (gradeFilter !== 'all' && f.grade !== gradeFilter) return false;
       if (sidoFilter !== '전체' && !f.sido.startsWith(sidoFilter)) return false;
       if (
@@ -183,7 +184,7 @@ export default function HomePage() {
   );
 
   const handleGoToMap = useCallback(
-    (nextType?: 'all' | FacilityType, query?: string) => {
+    (nextType?: 'all' | 'public' | FacilityType, query?: string) => {
       if (nextType) setTypeFilter(nextType);
       setSelectedFacility(null);
       setActiveTab('map');
@@ -319,14 +320,15 @@ export default function HomePage() {
             <div className="flex items-center gap-1.5 shrink-0">
               {[
                 { id: 'all', label: '전체' },
+                { id: 'public', label: '국공립(정부·지자체)' },
+                { id: 'hospital', label: '요양병원' },
                 { id: 'nursing', label: '요양원' },
                 { id: 'daycare', label: '주간보호센터' },
-                { id: 'hospital', label: '요양병원' },
                 { id: 'homecare', label: '집간병·방문요양' },
               ].map((t) => (
                 <button
                   key={t.id}
-                  onClick={() => setTypeFilter(t.id as 'all' | FacilityType)}
+                  onClick={() => setTypeFilter(t.id as 'all' | 'public' | FacilityType)}
                   className={`px-3.5 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap border transition ${
                     typeFilter === t.id
                       ? 'bg-[#0e8a8d] text-white border-[#0e8a8d]'

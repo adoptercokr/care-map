@@ -148,9 +148,9 @@ export default function RegionDirectory({
               className="h-10 px-3 rounded-xl border border-slate-200 text-sm font-semibold text-slate-800 bg-white"
             >
               <option value="all">모든 시설 유형</option>
+              <option value="hospital">요양병원</option>
               <option value="nursing">요양원</option>
               <option value="daycare">주간보호센터</option>
-              <option value="hospital">요양병원</option>
               <option value="homecare">집간병·방문요양</option>
             </select>
 
