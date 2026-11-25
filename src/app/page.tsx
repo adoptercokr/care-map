@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { CareFacility, ActiveTab, FacilityType, EvalGrade } from '../types/care';
+import { getGradeLabel } from '../utils/gradeLabel';
 import HomeHub from '../components/HomeHub';
 import RegionDirectory from '../components/RegionDirectory';
 import FacilityDetailSheet from '../components/FacilityDetailSheet';
@@ -453,9 +454,7 @@ export default function HomePage() {
                         }`}
                       >
                         <ShieldCheck className="w-3.5 h-3.5" />
-                        {selectedFacility.grade === 'NEW'
-                          ? '신설·평가대기'
-                          : `공단 ${selectedFacility.grade}등급`}
+                        {getGradeLabel(selectedFacility)}
                         {selectedFacility.score ? ` (${selectedFacility.score}점)` : ''}
                       </span>
                       <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-700">
@@ -622,7 +621,7 @@ export default function HomePage() {
                             <div className="flex items-center justify-between gap-2 mb-1">
                               <div className="flex items-center gap-1.5">
                                 <span className={`px-2 py-0.5 rounded text-xs font-bold border ${gCls}`}>
-                                  {f.grade === 'NEW' ? '신설' : `${f.grade}등급`}
+                                  {getGradeLabel(f, true)}
                                 </span>
                                 <span className="text-xs font-medium text-slate-500">{f.typeName}</span>
                               </div>

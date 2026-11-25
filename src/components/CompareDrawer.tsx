@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { CareFacility } from '../types/care';
+import { getGradeLabel } from '../utils/gradeLabel';
 import { X, Trash2 } from 'lucide-react';
 
 interface CompareDrawerProps {
@@ -62,7 +63,7 @@ export default function CompareDrawer({ items, isOpen, onClose, onRemove }: Comp
                   <td className="py-3 px-3 text-xs font-medium text-slate-500">공단 평가등급</td>
                   {items.map((item) => (
                     <td key={item.id} className="py-3 px-3 font-bold text-slate-900">
-                      {item.grade === 'NEW' ? '신설·미실시' : `${item.grade}등급`}
+                      {getGradeLabel(item)}
                       {item.score ? <span className="ml-1 text-xs font-normal text-slate-500">({item.score}점)</span> : null}
                     </td>
                   ))}

@@ -58,6 +58,14 @@ const GRADE_STYLE: Record<string, string> = {
   NEW: 'bg-slate-100 text-slate-600 border-slate-200',
 };
 
+function getGradeLabel(f: CareFacility, short = false): string {
+  if (f.type === 'hospital') return short ? '병원' : '심평원 등록';
+  if (f.grade !== 'NEW') return short ? `${f.grade}등급` : `공단 ${f.grade}등급`;
+  const yr = parseInt((f.established || '').slice(0, 4), 10);
+  if (!isNaN(yr) && yr >= 2024) return short ? '신설' : '신설기관';
+  return short ? '미평가' : '평가 미실시';
+}
+
 export default function HomeHub({
   facilities,
   compareIds,
@@ -227,7 +235,7 @@ export default function HomeHub({
                           GRADE_STYLE[previewSelected.grade] || GRADE_STYLE.NEW
                         }`}
                       >
-                        {previewSelected.grade === 'NEW' ? '신설기관' : `공단 ${previewSelected.grade}등급`}
+                        {getGradeLabel(previewSelected)}
                       </span>
                       <span className="text-sm font-medium text-slate-500">
                         {previewSelected.typeName}
@@ -343,7 +351,7 @@ export default function HomeHub({
                               GRADE_STYLE[f.grade] || GRADE_STYLE.NEW
                             }`}
                           >
-                            {f.grade === 'NEW' ? '신설' : `${f.grade}등급`}
+                            {getGradeLabel(f, true)}
                           </span>
                           <span className="text-xs font-medium text-slate-500">{f.typeName}</span>
                         </div>
@@ -421,7 +429,7 @@ export default function HomeHub({
                   <div className="flex flex-wrap items-center gap-1.5 mb-2">
                     <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold border ${gCls}`}>
                       <ShieldCheck className="w-3.5 h-3.5" />
-                      {f.grade === 'NEW' ? '신설기관' : `공단 ${f.grade}등급`}
+                      {getGradeLabel(f)}
                     </span>
                     <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-slate-100 text-slate-700">
                       {f.typeName}

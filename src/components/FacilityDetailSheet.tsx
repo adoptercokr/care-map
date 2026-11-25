@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { CareFacility } from '../types/care';
+import { getGradeLabel } from '../utils/gradeLabel';
 import { X, MapPin, Phone, Users, ShieldCheck, Navigation, Plus, Check } from 'lucide-react';
 
 interface FacilityDetailSheetProps {
@@ -42,7 +43,7 @@ export default function FacilityDetailSheet({
             <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
               <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold border ${badge.cls}`}>
                 <ShieldCheck className="w-3.5 h-3.5" />
-                {badge.label}
+                {getGradeLabel(facility)}
               </span>
               <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600">
                 {facility.typeName}

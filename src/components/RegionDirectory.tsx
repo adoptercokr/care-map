@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { CareFacility, FacilityType } from '../types/care';
+import { getGradeLabel } from '../utils/gradeLabel';
 import {
   MapPin,
   Phone,
@@ -219,7 +220,7 @@ export default function RegionDirectory({
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold border ${gCls}`}
                       >
                         <ShieldCheck className="w-3.5 h-3.5" />
-                        {f.grade === 'NEW' ? '신설기관' : `공단 ${f.grade}등급`}
+                        {getGradeLabel(f)}
                         {f.score ? ` (${f.score}점)` : ''}
                       </span>
                       <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-slate-100 text-slate-700">

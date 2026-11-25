@@ -5,6 +5,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import Supercluster from 'supercluster';
 import { CareFacility } from '../types/care';
+import { getGradeLabel } from '../utils/gradeLabel';
 import { Crosshair, Plus, Minus, RotateCcw, Layers, RefreshCw } from 'lucide-react';
 
 export interface MapBounds {
@@ -136,7 +137,7 @@ export default function CareMap({
         const f = props.facility;
         const isSelected = selectedFacility?.id === f.id;
         const mStyle = TYPE_MARKER_STYLE[f.type] || TYPE_MARKER_STYLE.nursing;
-        const gradeBadge = f.grade === 'NEW' ? '신설' : `${f.grade}`;
+        const gradeBadge = f.type === 'hospital' ? '병원' : f.grade === 'NEW' ? getGradeLabel(f, true) : `${f.grade}`;
 
         const icon = L.divIcon({
           className: 'care-pin-icon',
