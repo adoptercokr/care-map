@@ -93,9 +93,13 @@ export default function FacilityDetailSheet({
         {/* 핵심 지표 그리드 (실제 수집 데이터만 표기) */}
         <div className="mt-4 grid grid-cols-3 gap-2.5">
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <div className="text-xs text-slate-500">입소 정원</div>
+            <div className="text-xs text-slate-500">
+              {facility.type === 'hospital' ? '허가 병상' : '입소 정원'}
+            </div>
             <div className="mt-1 text-base font-bold text-slate-900">
-              {facility.capacity ? `${facility.capacity}명` : facility.type === 'hospital' ? '요양병원' : '재가/방문'}
+              {facility.type === 'hospital'
+                ? facility.capacity ? `${facility.capacity}병상` : '미제공'
+                : facility.capacity ? `${facility.capacity}명` : '재가/방문'}
             </div>
             <div className="text-xs text-slate-500">공단·심평원 기준</div>
           </div>
@@ -120,7 +124,14 @@ export default function FacilityDetailSheet({
           </div>
         </div>
 
-        <div className="mt-3.5 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+        {facility.staffDetail && (
+          <div className="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed">
+            <span className="font-bold text-slate-900">인력 세부 구성: </span>
+            {facility.staffDetail}
+          </div>
+        )}
+
+        <div className="mt-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-slate-700">설립 / 지정일</span>
             <span className="text-base font-extrabold text-slate-900">

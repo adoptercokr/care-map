@@ -195,16 +195,38 @@ def main():
         if i == 0 or not r[0]:
             continue
         code = str(r[0]).strip()
-        nurse = (int(r[8] or 0) if len(r) > 8 and isinstance(r[8], (int, float)) else 0) + (
-            int(r[9] or 0) if len(r) > 9 and isinstance(r[9], (int, float)) else 0
-        )
-        care = int(r[13] or 0) if len(r) > 13 and isinstance(r[13], (int, float)) else 0
+        def iv(idx):
+            return int(r[idx] or 0) if len(r) > idx and isinstance(r[idx], (int, float)) else 0
+        sw = iv(5)
+        doc_f = iv(6)
+        doc_p = iv(7)
+        rn = iv(8)
+        na = iv(9)
+        pt = iv(11)
+        ot = iv(12)
+        care = iv(13)
+        nut = iv(14)
+        total_score = care + rn + na + sw + pt + doc_f + doc_p
+
+        parts = []
+        if care: parts.append(f"요양보호사 {care}명")
+        if rn: parts.append(f"간호사 {rn}명")
+        if na: parts.append(f"간호조무사 {na}명")
+        if sw: parts.append(f"사회복지사 {sw}명")
+        if pt: parts.append(f"물리치료사 {pt}명")
+        if ot: parts.append(f"작업치료사 {ot}명")
+        if doc_f or doc_p: parts.append(f"의사 {doc_f + doc_p}명")
+        if nut: parts.append(f"영양사 {nut}명")
+        detail_str = " · ".join(parts)
+
         prev = staff_map.get(code)
-        if not prev:
-            staff_map[code] = {"care": care, "nurse": nurse}
-        else:
-            prev["care"] = max(prev["care"], care)
-            prev["nurse"] = max(prev["nurse"], nurse)
+        if not prev or total_score > prev["score"]:
+            staff_map[code] = {
+                "care": care,
+                "nurse": rn + na,
+                "detail": detail_str,
+                "score": total_score,
+            }
 
     facilities = []
     seen_codes = set()
@@ -244,7 +266,7 @@ def main():
             cap, cur = None, None
 
         dlat, dlng = deterministic_jitter(code)
-        st = staff_map.get(code, {"care": 0, "nurse": 0})
+        st = staff_map.get(code, {"care": 0, "nurse": 0, "detail": ""})
         grade = ev["grade"] if ev else "NEW"
         score = ev["score"] if ev else None
         eval_year = ev["evalYear"] if ev else ""
@@ -272,11 +294,34 @@ def main():
             "capacity": cap,
             "staffCare": st["care"],
             "staffNurse": st["nurse"],
+            "staffDetail": st.get("detail", ""),
             "established": est_fmt,
             "tags": [ftype_name, ownership],
         })
 
-    # 4. 건강보험심사평가원 전국 요양병원(전화번호·정밀좌표·의사수 포함) 병합
+    # 4. 건강보험심사평가원 전국 요양병원(전화번호·정밀좌표·실제 병상수·직종별 의사수 포함) 병합
+    beds_map: dict[str, dict] = {}
+    beds_file = RAW_DIR / "hira" / "facility_beds.csv"
+    if beds_file.exists():
+        with open(beds_file, "r", encoding="cp949", errors="replace") as f:
+            for row in csv.DictReader(f):
+                if "요양병원" not in (row.get("종별코드명") or ""):
+                    continue
+                key = (row.get("암호화요양기호") or "").strip()
+                def bi(col):
+                    try: return int(float(row.get(col) or 0))
+                    except ValueError: return 0
+                total_beds = (
+                    bi("일반입원실상급병상수")
+                    + bi("일반입원실일반병상수")
+                    + bi("성인중환자병상수")
+                    + bi("격리병실병상수")
+                )
+                beds_map[key] = {
+                    "beds": total_beds if total_beds > 0 else None,
+                    "owner": (row.get("설립구분코드명") or "").strip(),
+                }
+
     hira_file = RAW_DIR / "hira" / "hospitals.csv"
     hira_added = 0
     if hira_file.exists():
@@ -284,6 +329,7 @@ def main():
             for row in csv.DictReader(f):
                 if "요양병원" not in (row.get("종별코드명") or ""):
                     continue
+                key = (row.get("암호화요양기호") or "").strip()
                 name = (row.get("요양기관명") or "").strip()
                 addr = (row.get("주소") or "").strip()
                 tel = (row.get("전화번호") or "").strip()
@@ -299,13 +345,30 @@ def main():
                 sigungu = (row.get("시군구코드명") or "").strip()
                 est_raw = (row.get("개설일자") or "").strip()
                 est_fmt = f"{est_raw[:4]}-{est_raw[4:6]}-{est_raw[6:8]}" if len(est_raw) >= 8 else est_raw
-                docs = int(float(row.get("총의사수") or 0))
+
+                def hi(col):
+                    try: return int(float(row.get(col) or 0))
+                    except ValueError: return 0
+                docs = hi("총의사수")
+                md_spec = hi("의과전문의 인원수")
+                md_gen = hi("의과일반의 인원수")
+                km_spec = hi("한방전문의 인원수")
+                km_gen = hi("한방일반의 인원수")
+                dn_total = hi("치과전문의 인원수") + hi("치과일반의 인원수")
+                d_parts = []
+                if md_spec: d_parts.append(f"의과전문의 {md_spec}명")
+                if md_gen: d_parts.append(f"의과일반의 {md_gen}명")
+                if km_spec or km_gen: d_parts.append(f"한의사 {km_spec + km_gen}명")
+                if dn_total: d_parts.append(f"치과의사 {dn_total}명")
+                doc_detail = " · ".join(d_parts) if d_parts else (f"총 의사 {docs}명" if docs else "")
+
+                binfo = beds_map.get(key, {})
                 facilities.append({
                     "id": f"HIRA-{hira_added+1:05d}",
                     "name": name,
                     "type": "hospital",
                     "typeName": "요양병원",
-                    "ownership": map_ownership("", name),
+                    "ownership": map_ownership(binfo.get("owner", ""), name),
                     "grade": "NEW",
                     "score": None,
                     "evalYear": "",
@@ -315,9 +378,10 @@ def main():
                     "lat": round(lat, 6),
                     "lng": round(lng, 6),
                     "tel": tel,
-                    "capacity": None,
+                    "capacity": binfo.get("beds"),
                     "staffCare": 0,
                     "staffNurse": docs,
+                    "staffDetail": doc_detail,
                     "established": est_fmt,
                     "tags": ["요양병원", "심평원등록"],
                 })

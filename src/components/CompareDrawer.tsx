@@ -68,10 +68,20 @@ export default function CompareDrawer({ items, isOpen, onClose, onRemove }: Comp
                   ))}
                 </tr>
                 <tr>
-                  <td className="py-3 px-3 text-xs font-medium text-slate-500">입소 정원</td>
+                  <td className="py-3 px-3 text-xs font-medium text-slate-500">정원 / 병상</td>
                   {items.map((item) => (
                     <td key={item.id} className="py-3 px-3 text-slate-800">
-                      {item.capacity ? `${item.capacity}명` : item.type === 'hospital' ? '요양병원' : '재가/방문'}
+                      {item.type === 'hospital'
+                        ? item.capacity ? `${item.capacity}병상` : '미제공'
+                        : item.capacity ? `${item.capacity}명` : '재가/방문'}
+                    </td>
+                  ))}
+                </tr>
+                <tr>
+                  <td className="py-3 px-3 text-xs font-medium text-slate-500">세부 인력</td>
+                  {items.map((item) => (
+                    <td key={item.id} className="py-3 px-3 text-xs text-slate-700 leading-relaxed">
+                      {item.staffDetail || `${item.staffCare + item.staffNurse}명`}
                     </td>
                   ))}
                 </tr>

@@ -264,14 +264,24 @@ export default function RegionDirectory({
                         </a>
                       )}
                     </div>
+                    {f.staffDetail && (
+                      <div className="mt-1.5 text-xs text-slate-600">
+                        <span className="font-semibold text-slate-700">세부 인력: </span>
+                        {f.staffDetail}
+                      </div>
+                    )}
                   </div>
 
                   {/* 중앙: 세부 지표 박스 (실제 수집 데이터만 표기) */}
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 lg:w-[430px] shrink-0">
                     <div className="p-2.5 rounded-xl bg-[#f7f8fa]">
-                      <div className="text-[11px] text-slate-500">입소 정원</div>
+                      <div className="text-[11px] text-slate-500">
+                        {f.type === 'hospital' ? '허가 병상' : '입소 정원'}
+                      </div>
                       <div className="mt-0.5 text-sm font-bold text-slate-900">
-                        {f.capacity ? `${f.capacity}명` : f.type === 'hospital' ? '요양병원' : '재가/방문'}
+                        {f.type === 'hospital'
+                          ? f.capacity ? `${f.capacity}병상` : '미제공'
+                          : f.capacity ? `${f.capacity}명` : '재가/방문'}
                       </div>
                     </div>
                     <div className="p-2.5 rounded-xl bg-[#f7f8fa]">

@@ -492,9 +492,13 @@ export default function HomePage() {
 
                   <div className="grid grid-cols-3 gap-2">
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <div className="text-xs text-slate-500">입소 정원</div>
+                      <div className="text-xs text-slate-500">
+                        {selectedFacility.type === 'hospital' ? '허가 병상' : '입소 정원'}
+                      </div>
                       <div className="mt-1 text-base font-bold text-slate-900">
-                        {selectedFacility.capacity ? `${selectedFacility.capacity}명` : selectedFacility.type === 'hospital' ? '요양병원' : '재가/방문'}
+                        {selectedFacility.type === 'hospital'
+                          ? selectedFacility.capacity ? `${selectedFacility.capacity}병상` : '미제공'
+                          : selectedFacility.capacity ? `${selectedFacility.capacity}명` : '재가/방문'}
                       </div>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
@@ -512,6 +516,13 @@ export default function HomePage() {
                       </div>
                     </div>
                   </div>
+
+                  {selectedFacility.staffDetail && (
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed">
+                      <span className="font-bold text-slate-900">인력 세부 구성: </span>
+                      {selectedFacility.staffDetail}
+                    </div>
+                  )}
 
                   <div className="p-4 rounded-xl bg-[#eef8f8] border border-[#cbe8e8] space-y-1.5">
                     <div className="flex items-center justify-between">

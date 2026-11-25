@@ -28,6 +28,7 @@ export interface CareFacility {
   capacity: number | null;
   staffCare: number;
   staffNurse: number;
+  staffDetail?: string;
   established: string;
   tags: string[];
 }

@@ -259,9 +259,13 @@ export default function HomeHub({
 
                     <div className="mt-5 grid grid-cols-3 gap-2.5">
                       <div className="p-3 rounded-xl bg-[#f7f8fa]">
-                        <div className="text-xs text-slate-500">입소 정원</div>
+                        <div className="text-xs text-slate-500">
+                          {previewSelected.type === 'hospital' ? '허가 병상' : '입소 정원'}
+                        </div>
                         <div className="mt-1 text-base font-bold text-slate-900">
-                          {previewSelected.capacity ? `${previewSelected.capacity}명` : previewSelected.type === 'hospital' ? '요양병원' : '재가/방문'}
+                          {previewSelected.type === 'hospital'
+                            ? previewSelected.capacity ? `${previewSelected.capacity}병상` : '미제공'
+                            : previewSelected.capacity ? `${previewSelected.capacity}명` : '재가/방문'}
                         </div>
                       </div>
                       <div className="p-3 rounded-xl bg-[#f7f8fa]">
@@ -279,6 +283,13 @@ export default function HomeHub({
                         </div>
                       </div>
                     </div>
+
+                    {previewSelected.staffDetail && (
+                      <div className="mt-3 p-3 rounded-xl bg-[#f7f8fa] text-xs text-slate-700 leading-relaxed">
+                        <span className="font-bold text-slate-900">인력 세부: </span>
+                        {previewSelected.staffDetail}
+                      </div>
+                    )}
 
                     <div className="mt-4 p-3.5 rounded-xl border border-slate-200 flex items-center justify-between">
                       <span className="text-sm font-medium text-slate-600">설립 구분</span>
@@ -441,13 +452,22 @@ export default function HomeHub({
                       </a>
                     )}
                   </div>
+                  {f.staffDetail && (
+                    <div className="mt-1.5 text-xs text-slate-500 truncate">
+                      인력: {f.staffDetail}
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 lg:w-[420px] shrink-0">
                   <div className="p-2.5 rounded-xl bg-[#f7f8fa]">
-                    <div className="text-[11px] text-slate-500">입소 정원</div>
+                    <div className="text-[11px] text-slate-500">
+                      {f.type === 'hospital' ? '허가 병상' : '입소 정원'}
+                    </div>
                     <div className="mt-0.5 text-sm font-bold text-slate-900">
-                      {f.capacity ? `${f.capacity}명` : f.type === 'hospital' ? '요양병원' : '재가/방문'}
+                      {f.type === 'hospital'
+                        ? f.capacity ? `${f.capacity}병상` : '미제공'
+                        : f.capacity ? `${f.capacity}명` : '재가/방문'}
                     </div>
                   </div>
                   <div className="p-2.5 rounded-xl bg-[#f7f8fa]">
