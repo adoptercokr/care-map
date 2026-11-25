@@ -143,65 +143,80 @@ export default function RegionDirectory({
           </div>
         )}
 
-        {/* 3. 유형 + 세부 조건 필터 + 검색 */}
-        <div className="pt-3 border-t border-slate-100 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value as 'all' | FacilityType)}
-              className="h-10 px-3 rounded-xl border border-slate-200 text-sm font-semibold text-slate-800 bg-white"
-            >
-              <option value="all">모든 시설 유형</option>
-              <option value="hospital">요양병원</option>
-              <option value="nursing">요양원</option>
-              <option value="daycare">주간보호센터</option>
-              <option value="homecare">집간병·방문요양</option>
-              <option value="silvertown">실버타운</option>
-            </select>
-
-            <button
-              onClick={() => setOnlyPublic(!onlyPublic)}
-              className={`h-10 px-3.5 rounded-xl text-sm font-semibold border transition ${
-                onlyPublic
-                  ? 'bg-[#eef8f8] text-[#0e8a8d] border-[#0e8a8d]'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              {onlyPublic ? '✓ 국공립(정부·지자체)' : '국공립(정부·지자체)'}
-            </button>
-
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+        {/* 3. 유형 버튼 + 세부 조건 필터 + 검색 */}
+        <div className="pt-3 border-t border-slate-100 space-y-3">
+          <div>
+            <div className="text-xs font-bold text-slate-500 mb-2">시설 유형</div>
+            <div className="flex flex-wrap items-center gap-1.5">
               {[
-                { id: 'all', label: '전체 등급' },
-                { id: 'A', label: '최우수 (A / 1등급)' },
-                { id: 'B', label: '우수 (B / 2등급)' },
-                { id: 'C', label: '양호 (C / 3등급)' },
-                { id: 'DE', label: '보통·미흡 (D·E / 4·5등급)' },
-              ].map((g) => (
+                { id: 'all', label: '전체' },
+                { id: 'hospital', label: '요양병원' },
+                { id: 'nursing', label: '요양원' },
+                { id: 'daycare', label: '주간보호센터' },
+                { id: 'homecare', label: '집간병·방문요양' },
+                { id: 'silvertown', label: '실버타운' },
+              ].map((t) => (
                 <button
-                  key={g.id}
-                  onClick={() => setGradeFilter(g.id as 'all' | 'A' | 'B' | 'C' | 'DE')}
-                  className={`h-8 px-2.5 rounded-lg text-xs sm:text-sm font-semibold transition ${
-                    gradeFilter === g.id
-                      ? 'bg-white text-[#0e8a8d] shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
+                  key={t.id}
+                  onClick={() => setSelectedType(t.id as 'all' | FacilityType)}
+                  className={`h-9 px-3.5 rounded-full text-sm font-semibold border transition ${
+                    selectedType === t.id
+                      ? 'bg-[#0e8a8d] text-white border-[#0e8a8d]'
+                      : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400'
                   }`}
                 >
-                  {g.label}
+                  {t.label}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="relative w-full lg:w-64">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="시설명 또는 도로명 검색"
-              className="w-full h-10 pl-9 pr-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-slate-900"
-            />
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setOnlyPublic(!onlyPublic)}
+                className={`h-10 px-3.5 rounded-xl text-sm font-semibold border transition ${
+                  onlyPublic
+                    ? 'bg-[#eef8f8] text-[#0e8a8d] border-[#0e8a8d]'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                {onlyPublic ? '✓ 국공립(정부·지자체)' : '국공립(정부·지자체)'}
+              </button>
+
+              <div className="flex flex-wrap items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                {[
+                  { id: 'all', label: '전체 등급' },
+                  { id: 'A', label: '최우수 (A / 1등급)' },
+                  { id: 'B', label: '우수 (B / 2등급)' },
+                  { id: 'C', label: '양호 (C / 3등급)' },
+                  { id: 'DE', label: '보통·미흡 (D·E / 4·5등급)' },
+                ].map((g) => (
+                  <button
+                    key={g.id}
+                    onClick={() => setGradeFilter(g.id as 'all' | 'A' | 'B' | 'C' | 'DE')}
+                    className={`h-8 px-2.5 rounded-lg text-xs sm:text-sm font-semibold transition ${
+                      gradeFilter === g.id
+                        ? 'bg-white text-[#0e8a8d] shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    {g.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative w-full lg:w-64">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="시설명 또는 도로명 검색"
+                className="w-full h-10 pl-9 pr-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-slate-900"
+              />
+            </div>
           </div>
         </div>
       </div>
