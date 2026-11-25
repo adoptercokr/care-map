@@ -43,8 +43,6 @@ const CATEGORIES: { id: 'all' | FacilityType; label: string }[] = [
   { id: 'nursing', label: '요양원' },
   { id: 'daycare', label: '주간보호센터' },
   { id: 'hospital', label: '요양병원' },
-  { id: 'silvertown', label: '실버타운' },
-  { id: 'hospcare', label: '병원간병' },
   { id: 'homecare', label: '집간병·방문요양' },
 ];
 
@@ -169,7 +167,7 @@ export default function HomeHub({
                 주변 시설 지도 탐색
               </h2>
               <span className="text-sm font-semibold text-teal-700">
-                {filtered.length}곳
+                {filtered.length.toLocaleString()}곳
               </span>
             </div>
             <button
@@ -330,8 +328,8 @@ export default function HomeHub({
                           </span>
                           <span className="text-xs font-medium text-slate-500">{f.typeName}</span>
                         </div>
-                        <span className="text-xs font-bold text-teal-700">
-                          {f.waiting === 0 ? '즉시 가능' : `대기 ${f.waiting}명`}
+                        <span className="text-xs font-bold text-[#0e8a8d]">
+                          {f.score ? `${f.score}점` : f.ownership}
                         </span>
                       </div>
                       <div className="text-base font-bold text-[#191f28] truncate">{f.name}</div>
@@ -365,7 +363,7 @@ export default function HomeHub({
             onClick={() => onGoToRegion(selectedRegion)}
             className="inline-flex items-center gap-1 text-[15px] font-bold text-teal-700 hover:text-teal-800 shrink-0"
           >
-            지역 상세 필터 열기 ({regionFiltered.length}곳)
+            지역 상세 필터 열기 ({regionFiltered.length.toLocaleString()}곳)
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -499,7 +497,7 @@ export default function HomeHub({
               onClick={() => onGoToRegion(selectedRegion)}
               className="h-11 px-6 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-[15px] font-bold text-slate-800 transition"
             >
-              {selectedRegion === '전체' ? '전국' : selectedRegion} 시설 {regionFiltered.length}곳 전체 리스트 보기
+              {selectedRegion === '전체' ? '전국' : selectedRegion} 시설 {regionFiltered.length.toLocaleString()}곳 전체 리스트 보기
             </button>
           </div>
         )}

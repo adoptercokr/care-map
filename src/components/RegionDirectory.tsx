@@ -157,8 +157,6 @@ export default function RegionDirectory({
               <option value="nursing">요양원</option>
               <option value="daycare">주간보호센터</option>
               <option value="hospital">요양병원</option>
-              <option value="silvertown">실버타운</option>
-              <option value="hospcare">병원간병</option>
               <option value="homecare">집간병·방문요양</option>
             </select>
 
@@ -198,7 +196,7 @@ export default function RegionDirectory({
       {/* 검색 결과 헤더 */}
       <div className="mt-6 mb-3 flex items-center justify-between">
         <div className="text-base font-bold text-[#191f28]">
-          검색 결과 <span className="text-teal-700">{filtered.length}곳</span>
+          검색 결과 <span className="text-teal-700">{filtered.length.toLocaleString()}곳</span>
         </div>
         <div className="text-xs sm:text-sm text-slate-500">
           정원·현원·대기인원 및 1인실 비용은 시설 사정에 따라 변동될 수 있습니다.

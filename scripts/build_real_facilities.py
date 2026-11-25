@@ -7,6 +7,7 @@
 import csv
 import hashlib
 import json
+import math
 import urllib.request
 from pathlib import Path
 
@@ -110,9 +111,12 @@ def classify_type(tcode: str, tname: str, name: str) -> tuple[str, str, int]:
 
 
 def deterministic_jitter(code: str) -> tuple[float, float]:
-    h = int(hashlib.md5(code.encode("utf-8")).hexdigest()[:8], 16)
-    dlat = ((h % 1000) / 1000.0 - 0.5) * 0.005
-    dlng = (((h >> 12) % 1000) / 1000.0 - 0.5) * 0.006
+    # 사각 바둑판 격자 방지를 위해 원형(극좌표) 분포 사용
+    h = int(hashlib.md5(code.encode("utf-8")).hexdigest()[:12], 16)
+    angle = ((h % 3600) / 3600.0) * 2.0 * math.pi
+    radius = math.sqrt(((h >> 12) % 1000) / 1000.0) * 0.0035
+    dlat = radius * math.sin(angle)
+    dlng = radius * math.cos(angle) * 1.25
     return dlat, dlng
 
 
@@ -258,11 +262,63 @@ def main():
             "tags": [ftype_name, ownership],
         })
 
+    # 4. 건강보험심사평가원 전국 요양병원(전화번호·정밀좌표·의사수 포함) 병합
+    hira_file = RAW_DIR / "hira" / "hospitals.csv"
+    hira_added = 0
+    if hira_file.exists():
+        with open(hira_file, "r", encoding="cp949", errors="replace") as f:
+            for row in csv.DictReader(f):
+                if "요양병원" not in (row.get("종별코드명") or ""):
+                    continue
+                name = (row.get("요양기관명") or "").strip()
+                addr = (row.get("주소") or "").strip()
+                tel = (row.get("전화번호") or "").strip()
+                try:
+                    lng = float(row.get("좌표(X)") or 0)
+                    lat = float(row.get("좌표(Y)") or 0)
+                except ValueError:
+                    lng, lat = 0.0, 0.0
+                if not name or lat < 32 or lng < 124:
+                    continue
+                sido = short_sido((row.get("시도코드명") or "").strip())
+                sigungu = (row.get("시군구코드명") or "").strip()
+                est_raw = (row.get("개설일자") or "").strip()
+                est_fmt = f"{est_raw[:4]}-{est_raw[4:6]}-{est_raw[6:8]}" if len(est_raw) >= 8 else est_raw
+                docs = int(float(row.get("총의사수") or 0))
+                facilities.append({
+                    "id": f"HIRA-{hira_added+1:05d}",
+                    "name": name,
+                    "type": "hospital",
+                    "typeName": "요양병원",
+                    "ownership": "법인" if ("의료법인" in name or "재단" in name or "(의)" in name) else ("공립" if ("시립" in name or "도립" in name or "군립" in name) else "개인"),
+                    "grade": "NEW",
+                    "score": None,
+                    "evalYear": "",
+                    "addr": addr,
+                    "sido": sido,
+                    "sigungu": sigungu,
+                    "lat": round(lat, 6),
+                    "lng": round(lng, 6),
+                    "tel": tel,
+                    "capacity": None,
+                    "current": None,
+                    "waiting": None,
+                    "staffCare": 0,
+                    "staffNurse": docs,
+                    "mealCost": None,
+                    "room1Cost": None,
+                    "room2Cost": None,
+                    "monthlyBaseEstimate": None,
+                    "established": est_fmt,
+                    "tags": ["요양병원", "심평원등록"],
+                })
+                hira_added += 1
+
     OUT_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(OUT_FILE, "w", encoding="utf-8") as f:
         json.dump(facilities, f, ensure_ascii=False, separators=(",", ":"))
 
-    print(f"[DONE] Saved {len(facilities)} real facilities (unmatched={unmatched}) -> {OUT_FILE}")
+    print(f"[DONE] Saved {len(facilities)} real facilities (HIRA hospitals={hira_added}, unmatched={unmatched}) -> {OUT_FILE}")
 
 
 if __name__ == "__main__":

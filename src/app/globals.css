@@ -33,3 +33,7 @@ body {
   font-family: var(--font-pretendard);
   background: #eef2f6;
 }
+
+.leaflet-tile-container img {
+  outline: 1px solid transparent;
+}

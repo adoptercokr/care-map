@@ -147,6 +147,21 @@ export default function HomePage() {
       }
 
       const lower = q.toLowerCase();
+      // 1. 먼저 지역/역/구명 지오코딩 확인 (예: '강남', '강남역', '분당' 검색 시 해당 지역으로 정확히 이동)
+      try {
+        const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        if (data.found && data.lat && data.lng) {
+          setAppliedQuery('');
+          setSidoFilter('전체');
+          setSearchedPlaceLabel(data.name || q);
+          setTargetCenter({ lat: data.lat, lng: data.lng, zoom: 13, seq: Date.now() });
+          return;
+        }
+      } catch {
+        // fallback to facility matching
+      }
+
       const directMatches = facilities.filter(
         (f) =>
           f.name.toLowerCase().includes(lower) ||
@@ -159,20 +174,6 @@ export default function HomePage() {
         setSearchedPlaceLabel('');
         setFitBoundsTrigger((n) => n + 1);
         return;
-      }
-
-      try {
-        const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}`);
-        const data = await res.json();
-        if (data.found && data.lat && data.lng) {
-          setAppliedQuery('');
-          setSidoFilter('전체');
-          setSearchedPlaceLabel(data.name || q);
-          setTargetCenter({ lat: data.lat, lng: data.lng, zoom: 13, seq: Date.now() });
-          return;
-        }
-      } catch {
-        // fallback below
       }
 
       setAppliedQuery(q);
@@ -321,8 +322,6 @@ export default function HomePage() {
                 { id: 'nursing', label: '요양원' },
                 { id: 'daycare', label: '주간보호센터' },
                 { id: 'hospital', label: '요양병원' },
-                { id: 'silvertown', label: '실버타운' },
-                { id: 'hospcare', label: '병원간병' },
                 { id: 'homecare', label: '집간병·방문요양' },
               ].map((t) => (
                 <button
@@ -416,11 +415,11 @@ export default function HomePage() {
                     {searchedPlaceLabel ? (
                       <>
                         <strong className="text-[#0e8a8d]">{searchedPlaceLabel}</strong> 주변{' '}
-                        <strong className="text-[#0e8a8d]">{visibleMapFacilities.length}곳</strong>
+                        <strong className="text-[#0e8a8d]">{visibleMapFacilities.length.toLocaleString()}곳</strong>
                       </>
                     ) : (
                       <>
-                        현재 지도 내 <strong className="text-[#0e8a8d]">{visibleMapFacilities.length}곳</strong> (전체 {filteredFacilities.length}곳)
+                        현재 지도 내 <strong className="text-[#0e8a8d]">{visibleMapFacilities.length.toLocaleString()}곳</strong> (전체 {filteredFacilities.length.toLocaleString()}곳)
                       </>
                     )}
                   </span>
@@ -657,7 +656,7 @@ export default function HomePage() {
                 className="h-10 px-3.5 rounded-full bg-white border border-slate-200 shadow-md text-sm font-bold text-slate-800 flex items-center gap-1.5 shrink-0"
               >
                 <List className="w-4 h-4 text-[#0e8a8d]" />
-                목록 ({visibleMapFacilities.length})
+                목록 ({visibleMapFacilities.length.toLocaleString()})
               </button>
               <form
                 onSubmit={(e) => {
