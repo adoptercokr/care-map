@@ -183,7 +183,17 @@ export default function RootLayout({
         }}
       />
   </head>
-      <body className="bg-slate-50 text-slate-900 antialiased">{children}</body>
+      <body className="bg-slate-50 text-slate-900 antialiased">
+        {children}
+        {/* Invisible hits.sh Real-time Counter Badge */}
+        <img
+          src="https://hits.sh/care.animap.co.kr.svg?view=today-total&style=flat-square&color=059669"
+          alt=""
+          width="1"
+          height="1"
+          style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: '1px', height: '1px' }}
+        />
+      </body>
     </html>
   );
 }
