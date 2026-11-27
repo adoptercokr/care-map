@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { CareFacility, FacilityType } from '../types/care';
-import { getGradeLabel } from '../utils/gradeLabel';
+import { getGradeLabel, getCapacityLabel } from '../utils/gradeLabel';
 import {
   MapPin,
   Phone,
@@ -117,12 +117,12 @@ export default function RegionDirectory({
       .sort((a, b) => {
         const sidoDiff = getSidoRank(a.sido) - getSidoRank(b.sido);
         if (sidoDiff !== 0) return sidoDiff;
-        const pubDiff = (a.ownership === '국공립' ? 0 : 1) - (b.ownership === '국공립' ? 0 : 1);
-        if (pubDiff !== 0) return pubDiff;
         const typeDiff = (TYPE_RANK[a.type] ?? 9) - (TYPE_RANK[b.type] ?? 9);
         if (typeDiff !== 0) return typeDiff;
         const gDiff = (GRADE_RANK[a.grade] ?? 9) - (GRADE_RANK[b.grade] ?? 9);
         if (gDiff !== 0) return gDiff;
+        const pubDiff = (a.ownership === '국공립' ? 0 : 1) - (b.ownership === '국공립' ? 0 : 1);
+        if (pubDiff !== 0) return pubDiff;
         const sgDiff = (a.sigungu || '').localeCompare(b.sigungu || '', 'ko');
         if (sgDiff !== 0) return sgDiff;
         return a.name.localeCompare(b.name, 'ko');
@@ -377,9 +377,7 @@ export default function RegionDirectory({
                         {f.type === 'hospital' ? '허가 병상' : '입소 정원'}
                       </div>
                       <div className="mt-0.5 text-sm font-bold text-slate-900">
-                        {f.type === 'hospital'
-                          ? f.capacity ? `${f.capacity}병상` : '미제공'
-                          : f.capacity ? `${f.capacity}명` : '재가/방문'}
+                        {getCapacityLabel(f)}
                       </div>
                     </div>
                     <div className="p-2.5 rounded-xl bg-[#f7f8fa]">

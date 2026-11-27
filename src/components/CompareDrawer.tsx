@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { CareFacility } from '../types/care';
-import { getGradeLabel } from '../utils/gradeLabel';
+import { getGradeLabel, getCapacityLabel } from '../utils/gradeLabel';
 import { X, Trash2 } from 'lucide-react';
 
 interface CompareDrawerProps {
@@ -72,9 +72,7 @@ export default function CompareDrawer({ items, isOpen, onClose, onRemove }: Comp
                   <td className="py-3 px-3 text-xs font-medium text-slate-500">정원 / 병상</td>
                   {items.map((item) => (
                     <td key={item.id} className="py-3 px-3 text-slate-800">
-                      {item.type === 'hospital'
-                        ? item.capacity ? `${item.capacity}병상` : '미제공'
-                        : item.capacity ? `${item.capacity}명` : '재가/방문'}
+                      {getCapacityLabel(item)}
                     </td>
                   ))}
                 </tr>

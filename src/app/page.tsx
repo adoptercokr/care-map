@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { CareFacility, ActiveTab, FacilityType, EvalGrade } from '../types/care';
-import { getGradeLabel } from '../utils/gradeLabel';
+import { getGradeLabel, getCapacityLabel } from '../utils/gradeLabel';
 import { FACILITY_ICON_META } from '../utils/facilityIcons';
 import HomeHub from '../components/HomeHub';
 import RegionDirectory from '../components/RegionDirectory';
@@ -540,9 +540,7 @@ export default function HomePage() {
                         {selectedFacility.type === 'hospital' ? '허가 병상' : '입소 정원'}
                       </div>
                       <div className="mt-1 text-base font-bold text-slate-900">
-                        {selectedFacility.type === 'hospital'
-                          ? selectedFacility.capacity ? `${selectedFacility.capacity}병상` : '미제공'
-                          : selectedFacility.capacity ? `${selectedFacility.capacity}명` : '재가/방문'}
+                        {getCapacityLabel(selectedFacility)}
                       </div>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
@@ -701,9 +699,7 @@ export default function HomePage() {
 
                             <div className="mt-2 flex items-center justify-between text-sm">
                               <span className="text-slate-500">
-                                {f.type === 'hospital'
-                                  ? f.capacity ? `허가 ${f.capacity}병상` : '의료기관'
-                                  : f.capacity ? `정원 ${f.capacity}명` : '재가/방문'} · {f.ownership}
+                                {getCapacityLabel(f, true)} · {f.ownership}
                               </span>
                               <span className="font-bold text-[#0e8a8d]">
                                 인력 {f.staffCare + f.staffNurse}명

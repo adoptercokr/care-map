@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { CareFacility, FacilityType, ActiveTab } from '../types/care';
-import { getGradeLabel } from '../utils/gradeLabel';
+import { getGradeLabel, getCapacityLabel } from '../utils/gradeLabel';
 import {
   Search,
   MapPin,
@@ -271,9 +271,7 @@ export default function HomeHub({
                           {previewSelected.type === 'hospital' ? '허가 병상' : '입소 정원'}
                         </div>
                         <div className="mt-1 text-base font-bold text-slate-900">
-                          {previewSelected.type === 'hospital'
-                            ? previewSelected.capacity ? `${previewSelected.capacity}병상` : '미제공'
-                            : previewSelected.capacity ? `${previewSelected.capacity}명` : '재가/방문'}
+                          {getCapacityLabel(previewSelected)}
                         </div>
                       </div>
                       <div className="p-3 rounded-xl bg-[#f7f8fa]">
@@ -483,9 +481,7 @@ export default function HomeHub({
                       {f.type === 'hospital' ? '허가 병상' : '입소 정원'}
                     </div>
                     <div className="mt-0.5 text-sm font-bold text-slate-900">
-                      {f.type === 'hospital'
-                        ? f.capacity ? `${f.capacity}병상` : '미제공'
-                        : f.capacity ? `${f.capacity}명` : '재가/방문'}
+                      {getCapacityLabel(f)}
                     </div>
                   </div>
                   <div className="p-2.5 rounded-xl bg-[#f7f8fa]">

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { CareFacility } from '../types/care';
-import { getGradeLabel } from '../utils/gradeLabel';
+import { getGradeLabel, getCapacityLabel } from '../utils/gradeLabel';
 import { X, MapPin, Phone, Users, ShieldCheck, Navigation, Plus, Check } from 'lucide-react';
 
 interface FacilityDetailSheetProps {
@@ -98,9 +98,7 @@ export default function FacilityDetailSheet({
               {facility.type === 'hospital' ? '허가 병상' : '입소 정원'}
             </div>
             <div className="mt-1 text-base font-bold text-slate-900">
-              {facility.type === 'hospital'
-                ? facility.capacity ? `${facility.capacity}병상` : '미제공'
-                : facility.capacity ? `${facility.capacity}명` : '재가/방문'}
+              {getCapacityLabel(facility)}
             </div>
             <div className="text-xs text-slate-500">공단·심평원 기준</div>
           </div>
