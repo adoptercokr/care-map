@@ -47,12 +47,21 @@ export const metadata: Metadata = {
     siteName: "케어맵 CareMap",
     type: "website",
     locale: "ko_KR",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "케어맵 - 전국 요양병원·요양원·주간보호센터·실버타운 등급 비교 지도",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "케어맵 | 전국 요양병원·요양원 등급 비교 지도",
     description:
       "공단 장기요양 A~E등급, 심평원 요양병원 1~5등급, 국공립 시설을 지도에서 바로 비교하세요.",
+    images: ["/og-image.png"],
   },
   verification: {
     other: {
