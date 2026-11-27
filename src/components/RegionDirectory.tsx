@@ -192,7 +192,7 @@ export default function RegionDirectory({
                 { id: 'hospital', label: '요양병원' },
                 { id: 'nursing', label: '요양원' },
                 { id: 'daycare', label: '주간보호센터' },
-                { id: 'homecare', label: '집간병·방문요양' },
+                { id: 'homecare', label: '방문요양(센터)' },
                 { id: 'silvertown', label: '실버타운·양로원' },
               ].map((t) => (
                 <button
