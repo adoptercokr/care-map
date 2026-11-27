@@ -117,14 +117,14 @@ export default function RegionDirectory({
       .sort((a, b) => {
         const sidoDiff = getSidoRank(a.sido) - getSidoRank(b.sido);
         if (sidoDiff !== 0) return sidoDiff;
-        const sgDiff = (a.sigungu || '').localeCompare(b.sigungu || '', 'ko');
-        if (sgDiff !== 0) return sgDiff;
         const pubDiff = (a.ownership === '국공립' ? 0 : 1) - (b.ownership === '국공립' ? 0 : 1);
         if (pubDiff !== 0) return pubDiff;
         const typeDiff = (TYPE_RANK[a.type] ?? 9) - (TYPE_RANK[b.type] ?? 9);
         if (typeDiff !== 0) return typeDiff;
         const gDiff = (GRADE_RANK[a.grade] ?? 9) - (GRADE_RANK[b.grade] ?? 9);
         if (gDiff !== 0) return gDiff;
+        const sgDiff = (a.sigungu || '').localeCompare(b.sigungu || '', 'ko');
+        if (sgDiff !== 0) return sgDiff;
         return a.name.localeCompare(b.name, 'ko');
       });
   }, [
