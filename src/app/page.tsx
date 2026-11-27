@@ -202,9 +202,12 @@ export default function HomePage() {
 
   const handleSelectFacilityFromHome = useCallback((facility: CareFacility) => {
     setTypeFilter('all');
+    setSidoFilter('전체');
+    setGradeFilter('all');
     setSearchQuery('');
     setAppliedQuery('');
     setSearchedPlaceLabel('');
+    setMobileListOpen(false);
     setSelectedFacility(facility);
     setActiveTab('map');
   }, []);

@@ -191,9 +191,17 @@ export default function CareMap({
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
+    const initCenter: [number, number] = selectedFacility
+      ? [selectedFacility.lat, selectedFacility.lng]
+      : [37.5172, 127.0473];
+    const initZoom = selectedFacility ? 16 : 11;
+    if (selectedFacility) {
+      lastPannedIdRef.current = selectedFacility.id;
+    }
+
     const map = L.map(containerRef.current, {
-      center: [37.5172, 127.0473],
-      zoom: 11,
+      center: initCenter,
+      zoom: initZoom,
       minZoom: 6,
       maxZoom: 18,
       zoomControl: false,

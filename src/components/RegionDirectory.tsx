@@ -335,13 +335,22 @@ export default function RegionDirectory({
                       </span>
                     </div>
 
-                    <h3 className="text-lg sm:text-xl font-extrabold text-[#191f28]">{f.name}</h3>
+                    <h3
+                      onClick={() => onSelectOnMap(f)}
+                      className="text-lg sm:text-xl font-extrabold text-[#191f28] hover:text-[#0e8a8d] cursor-pointer transition inline-block"
+                    >
+                      {f.name}
+                    </h3>
 
                     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">
-                      <span className="inline-flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => onSelectOnMap(f)}
+                        className="inline-flex items-center gap-1 text-left hover:text-[#0e8a8d] hover:underline cursor-pointer transition"
+                      >
                         <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
-                        {f.addr}
-                      </span>
+                        <span>{f.addr}</span>
+                      </button>
                       {f.tel ? (
                         <a
                           href={`tel:${f.tel.replace(/[^0-9+]/g, '')}`}
