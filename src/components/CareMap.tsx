@@ -111,7 +111,7 @@ export default function CareMap({
         marker.addTo(layerGroup);
       } else if (props.facility) {
         const f = props.facility;
-        const isSelected = selectedFacility?.id === f.id;
+        if (selectedFacility?.id === f.id) return; // 선택된 시설은 클러스터 여부와 무관하게 최상단에 별도 렌더링
         const mStyle = TYPE_MARKER_STYLE[f.type] || TYPE_MARKER_STYLE.nursing;
         const shortTypeMap: Record<string, string> = {
           hospital: '병원',
@@ -124,31 +124,64 @@ export default function CareMap({
 
         const icon = L.divIcon({
           className: 'care-pin-icon',
-          html: isSelected
-            ? `
-            <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:9999px;background:#0e8a8d;color:#ffffff;border:2px solid #ffffff;box-shadow:0 6px 16px rgba(14,138,141,0.35);white-space:nowrap;transform:scale(1.06);">
-              <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:9999px;background:rgba(255,255,255,0.2);flex-shrink:0;">${mStyle.svg}</span>
-              <span style="font-size:12px;font-weight:700;letter-spacing:-0.02em;max-width:140px;overflow:hidden;text-overflow:ellipsis;">${f.name}</span>
-              <span style="font-size:11px;font-weight:800;color:#ccfbf1;">${gradeBadge}</span>
-            </div>
-          `
-            : `
+          html: `
             <div style="display:inline-flex;align-items:center;gap:4px;padding:3px 7px 3px 3px;border-radius:9999px;background:#ffffff;color:#0f172a;border:1.5px solid ${mStyle.color};box-shadow:0 3px 8px rgba(15,23,42,0.16);white-space:nowrap;">
               <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:9999px;background:${mStyle.color};flex-shrink:0;">${mStyle.svg}</span>
               <span style="font-size:11px;font-weight:800;color:${mStyle.color};">${gradeBadge}</span>
             </div>
           `,
-          iconSize: isSelected ? [170, 34] : [54, 30],
-          iconAnchor: isSelected ? [85, 17] : [27, 15],
+          iconSize: [54, 30],
+          iconAnchor: [27, 15],
         });
 
-        const marker = L.marker([lat, lng], { icon, zIndexOffset: isSelected ? 900 : 100 });
+        const marker = L.marker([lat, lng], { icon, zIndexOffset: 100 });
         marker.on('click', () => {
           onSelectFacility(f);
         });
         marker.addTo(layerGroup);
       }
     });
+
+    // 선택된 시설은 클러스터에 가려지지 않도록 항상 크고 선명한 전용 마커로 최상단(zIndex 2000)에 표시
+    if (selectedFacility) {
+      const mStyle = TYPE_MARKER_STYLE[selectedFacility.type] || TYPE_MARKER_STYLE.nursing;
+      const shortTypeMap: Record<string, string> = {
+        hospital: '병원',
+        nursing: '요양',
+        daycare: '주간',
+        homecare: '방문',
+        silvertown: '실버',
+      };
+      const gradeBadge =
+        selectedFacility.grade !== 'NEW'
+          ? `${selectedFacility.grade}등급`
+          : shortTypeMap[selectedFacility.type] || '시설';
+
+      const selectedIcon = L.divIcon({
+        className: 'care-selected-pin-icon',
+        html: `
+          <div style="position:relative;display:inline-flex;flex-direction:column;align-items:center;transform:translate(-50%,-100%);">
+            <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border-radius:9999px;background:#191f28;color:#ffffff;border:3px solid #ffffff;box-shadow:0 10px 24px rgba(15,23,42,0.42),0 0 0 4px rgba(14,138,141,0.35);white-space:nowrap;">
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:9999px;background:#0e8a8d;flex-shrink:0;">${mStyle.svg}</span>
+              <span style="font-size:14px;font-weight:800;letter-spacing:-0.02em;max-width:190px;overflow:hidden;text-overflow:ellipsis;">${selectedFacility.name}</span>
+              <span style="padding:2px 7px;border-radius:9999px;background:#0e8a8d;font-size:11px;font-weight:800;color:#ffffff;">${gradeBadge}</span>
+            </div>
+            <div style="width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:10px solid #191f28;margin-top:-2px;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.25));"></div>
+          </div>
+        `,
+        iconSize: [0, 0],
+        iconAnchor: [0, 0],
+      });
+
+      const selectedMarker = L.marker([selectedFacility.lat, selectedFacility.lng], {
+        icon: selectedIcon,
+        zIndexOffset: 2000,
+      });
+      selectedMarker.on('click', () => {
+        onSelectFacility(selectedFacility);
+      });
+      selectedMarker.addTo(layerGroup);
+    }
   }, [clusterIndex, selectedFacility, onSelectFacility]);
 
   useEffect(() => {
@@ -248,7 +281,7 @@ export default function CareMap({
     if (!map || !selectedFacility) return;
     if (lastPannedIdRef.current !== selectedFacility.id) {
       lastPannedIdRef.current = selectedFacility.id;
-      map.setView([selectedFacility.lat, selectedFacility.lng], Math.max(map.getZoom(), 14), {
+      map.setView([selectedFacility.lat, selectedFacility.lng], Math.max(map.getZoom(), 16), {
         animate: true,
       });
     }
