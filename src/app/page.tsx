@@ -97,7 +97,7 @@ export default function HomePage() {
   } | null>(null);
 
   useEffect(() => {
-    fetch('/data/facilities.json?v=20261128')
+    fetch('/data/facilities.json?v=20261128b')
       .then((res) => res.json())
       .then((data: CareFacility[]) => {
         setFacilities(data);
@@ -572,23 +572,30 @@ export default function HomePage() {
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-semibold text-slate-700">설립 / 지정일</span>
                       <span className="text-base font-extrabold text-[#0e8a8d]">
-                        {selectedFacility.established}
+                        {selectedFacility.established || '미제공'}
                       </span>
                     </div>
                   </div>
 
+                  {selectedFacility.type === 'homecare' && (
+                    <div className="p-3.5 rounded-xl bg-teal-50/70 border border-teal-200 text-xs text-teal-900 leading-relaxed">
+                      <span className="font-bold block mb-0.5">요양보호사 파견 · 재가 돌봄 연계 센터</span>
+                      어르신 댁으로 방문요양보호사를 배정·연계하는 재가장기요양기관입니다. 위 전화번호로 파견 가능 여부와 일정을 바로 문의하실 수 있습니다.
+                    </div>
+                  )}
+
                   <div className="space-y-2 pt-1">
                     <div className="grid grid-cols-2 gap-2">
                       <a
-                        href={`https://map.naver.com/p/search/${encodeURIComponent(
-                          selectedFacility.name + ' ' + selectedFacility.sigungu
-                        )}`}
+                        href={`https://map.naver.com/p/directions/-/${selectedFacility.lng},${selectedFacility.lat},${encodeURIComponent(
+                          selectedFacility.name
+                        )}/-/car`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="h-10 rounded-xl text-sm font-semibold bg-white border border-slate-300 text-slate-800 hover:bg-slate-50 flex items-center justify-center gap-2 transition"
+                        className="h-10 rounded-xl text-sm font-bold bg-[#03C75A] hover:bg-[#02b350] text-white flex items-center justify-center gap-1.5 transition shadow-xs"
                       >
-                        <span className="w-2 h-2 rounded-full bg-[#03C75A]" />
-                        네이버 지도
+                        <Navigation className="w-4 h-4" />
+                        네이버 길찾기
                       </a>
                       <a
                         href={`https://map.kakao.com/link/to/${encodeURIComponent(
@@ -596,10 +603,10 @@ export default function HomePage() {
                         )},${selectedFacility.lat},${selectedFacility.lng}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="h-10 rounded-xl text-sm font-semibold bg-white border border-slate-300 text-slate-800 hover:bg-slate-50 flex items-center justify-center gap-2 transition"
+                        className="h-10 rounded-xl text-sm font-bold bg-[#FEE500] hover:bg-[#f5dc00] text-[#3C1E1E] flex items-center justify-center gap-1.5 transition shadow-xs"
                       >
-                        <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
-                        카카오맵
+                        <Navigation className="w-4 h-4" />
+                        카카오 길찾기
                       </a>
                     </div>
                     <button

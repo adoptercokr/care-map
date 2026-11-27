@@ -7,6 +7,7 @@ import { getGradeLabel } from '../utils/gradeLabel';
 import {
   Search,
   MapPin,
+  Navigation,
   ArrowRight,
   Calculator,
   BookOpen,
@@ -309,22 +310,22 @@ export default function HomeHub({
                   <div className="mt-4 space-y-2">
                     <div className="grid grid-cols-2 gap-2">
                       <a
-                        href={`https://map.naver.com/p/search/${encodeURIComponent(previewSelected.name + ' ' + previewSelected.sigungu)}`}
+                        href={`https://map.naver.com/p/directions/-/${previewSelected.lng},${previewSelected.lat},${encodeURIComponent(previewSelected.name)}/-/car`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="h-10 rounded-xl bg-white border border-slate-300 text-slate-800 text-sm font-semibold hover:bg-slate-50 flex items-center justify-center gap-2 transition"
+                        className="h-10 rounded-xl bg-[#03C75A] hover:bg-[#02b350] text-white text-sm font-bold flex items-center justify-center gap-1.5 transition shadow-xs"
                       >
-                        <span className="w-2 h-2 rounded-full bg-[#03C75A]" />
-                        네이버 지도
+                        <Navigation className="w-4 h-4" />
+                        네이버 길찾기
                       </a>
                       <a
                         href={`https://map.kakao.com/link/to/${encodeURIComponent(previewSelected.name)},${previewSelected.lat},${previewSelected.lng}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="h-10 rounded-xl bg-white border border-slate-300 text-slate-800 text-sm font-semibold hover:bg-slate-50 flex items-center justify-center gap-2 transition"
+                        className="h-10 rounded-xl bg-[#FEE500] hover:bg-[#f5dc00] text-[#3C1E1E] text-sm font-bold flex items-center justify-center gap-1.5 transition shadow-xs"
                       >
-                        <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
-                        카카오맵
+                        <Navigation className="w-4 h-4" />
+                        카카오 길찾기
                       </a>
                     </div>
                     <button

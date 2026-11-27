@@ -31,7 +31,7 @@ export default function FacilityDetailSheet({
 
   const badge = GRADE_BADGE[facility.grade] || GRADE_BADGE.NEW;
   const kakaoMapUrl = `https://map.kakao.com/link/to/${encodeURIComponent(facility.name)},${facility.lat},${facility.lng}`;
-  const naverMapUrl = `https://map.naver.com/p/search/${encodeURIComponent(facility.name + ' ' + facility.sigungu)}`;
+  const naverMapUrl = `https://map.naver.com/p/directions/-/${facility.lng},${facility.lat},${encodeURIComponent(facility.name)}/-/car`;
   const telHref = facility.tel ? `tel:${facility.tel.replace(/[^0-9+]/g, '')}` : undefined;
 
   return (
@@ -141,26 +141,33 @@ export default function FacilityDetailSheet({
           </div>
         </div>
 
-        {/* 하단 액션: 비교함 + 네이버 지도 + 카카오맵 (심플 상용 스타일) */}
+        {facility.type === 'homecare' && (
+          <div className="mt-3 p-3 rounded-xl bg-teal-50/70 border border-teal-200 text-xs text-teal-900 leading-relaxed">
+            <span className="font-bold block mb-0.5">요양보호사 파견 · 재가 돌봄 연계 센터</span>
+            어르신 댁으로 방문요양보호사를 배정·연계하는 재가장기요양기관입니다.
+          </div>
+        )}
+
+        {/* 하단 액션: 네이버 길찾기 + 카카오 길찾기 + 비교함 */}
         <div className="mt-4 space-y-2">
           <div className="grid grid-cols-2 gap-2">
             <a
               href={naverMapUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="h-10 rounded-xl text-sm font-semibold bg-white border border-slate-300 text-slate-800 hover:bg-slate-50 flex items-center justify-center gap-2 transition"
+              className="h-10 rounded-xl text-sm font-bold bg-[#03C75A] hover:bg-[#02b350] text-white flex items-center justify-center gap-1.5 transition shadow-xs"
             >
-              <span className="w-2 h-2 rounded-full bg-[#03C75A]" />
-              네이버 지도
+              <Navigation className="w-4 h-4" />
+              네이버 길찾기
             </a>
             <a
               href={kakaoMapUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="h-10 rounded-xl text-sm font-semibold bg-white border border-slate-300 text-slate-800 hover:bg-slate-50 flex items-center justify-center gap-2 transition"
+              className="h-10 rounded-xl text-sm font-bold bg-[#FEE500] hover:bg-[#f5dc00] text-[#3C1E1E] flex items-center justify-center gap-1.5 transition shadow-xs"
             >
-              <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
-              카카오맵
+              <Navigation className="w-4 h-4" />
+              카카오 길찾기
             </a>
           </div>
           <button

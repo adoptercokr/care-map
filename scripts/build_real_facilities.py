@@ -362,7 +362,8 @@ def main():
                 tel = normalize_tel(tel, sido)
                 sigungu = (row.get("시군구코드명") or "").strip()
                 est_raw = (row.get("개설일자") or "").strip()
-                est_fmt = f"{est_raw[:4]}-{est_raw[4:6]}-{est_raw[6:8]}" if len(est_raw) >= 8 else est_raw
+                est_digits = "".join(ch for ch in est_raw if ch.isdigit())
+                est_fmt = f"{est_digits[:4]}-{est_digits[4:6]}-{est_digits[6:8]}" if len(est_digits) >= 8 else est_raw
 
                 def hi(col):
                     try: return int(float(row.get(col) or 0))
