@@ -54,6 +54,11 @@ export const metadata: Metadata = {
     description:
       "공단 장기요양 A~E등급, 심평원 요양병원 1~5등급, 국공립 시설을 지도에서 바로 비교하세요.",
   },
+  verification: {
+    other: {
+      "naver-site-verification": "258648c655031360357844f7881bfd5f363ae2ce",
+    },
+  },
 };
 
 export const viewport: Viewport = {
