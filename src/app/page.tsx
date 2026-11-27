@@ -97,7 +97,7 @@ export default function HomePage() {
   } | null>(null);
 
   useEffect(() => {
-    fetch('/data/facilities.json')
+    fetch('/data/facilities.json?v=20261128')
       .then((res) => res.json())
       .then((data: CareFacility[]) => {
         setFacilities(data);
