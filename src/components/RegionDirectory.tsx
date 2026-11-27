@@ -26,6 +26,35 @@ const SIDO_TABS = [
   '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주',
 ];
 
+const SIDO_ORDER: Record<string, number> = SIDO_TABS.slice(1).reduce<Record<string, number>>(
+  (acc, sido, idx) => {
+    acc[sido] = idx;
+    return acc;
+  },
+  {}
+);
+
+const GRADE_RANK: Record<string, number> = {
+  A: 1,
+  '1': 1,
+  B: 2,
+  '2': 2,
+  C: 3,
+  '3': 3,
+  D: 4,
+  '4': 4,
+  E: 5,
+  '5': 5,
+  NEW: 6,
+};
+
+function getSidoRank(sido: string): number {
+  for (const [key, idx] of Object.entries(SIDO_ORDER)) {
+    if (sido.startsWith(key)) return idx;
+  }
+  return 99;
+}
+
 const GRADE_STYLE: Record<string, string> = {
   A: 'bg-emerald-50 text-emerald-800 border-emerald-200',
   B: 'bg-blue-50 text-blue-800 border-blue-200',
@@ -58,23 +87,33 @@ export default function RegionDirectory({
         .filter((f) => f.sido.startsWith(selectedSido) && f.sigungu)
         .map((f) => f.sigungu)
     );
-    return ['전체', ...Array.from(set)];
+    return ['전체', ...Array.from(set).sort((a, b) => a.localeCompare(b, 'ko'))];
   }, [facilities, selectedSido]);
 
   const filtered = useMemo(() => {
     const q = keyword.trim().toLowerCase();
-    return facilities.filter((f) => {
-      if (selectedSido !== '전체' && !f.sido.startsWith(selectedSido)) return false;
-      if (selectedSigungu !== '전체' && f.sigungu !== selectedSigungu) return false;
-      if (selectedType !== 'all' && f.type !== selectedType) return false;
-      if (gradeFilter === 'A' && f.grade !== 'A' && f.grade !== '1') return false;
-      if (gradeFilter === 'B' && f.grade !== 'B' && f.grade !== '2') return false;
-      if (gradeFilter === 'C' && f.grade !== 'C' && f.grade !== '3') return false;
-      if (gradeFilter === 'DE' && !['D', 'E', '4', '5'].includes(f.grade)) return false;
-      if (onlyPublic && f.ownership !== '국공립') return false;
-      if (q && !f.name.toLowerCase().includes(q) && !f.addr.toLowerCase().includes(q)) return false;
-      return true;
-    });
+    return facilities
+      .filter((f) => {
+        if (selectedSido !== '전체' && !f.sido.startsWith(selectedSido)) return false;
+        if (selectedSigungu !== '전체' && f.sigungu !== selectedSigungu) return false;
+        if (selectedType !== 'all' && f.type !== selectedType) return false;
+        if (gradeFilter === 'A' && f.grade !== 'A' && f.grade !== '1') return false;
+        if (gradeFilter === 'B' && f.grade !== 'B' && f.grade !== '2') return false;
+        if (gradeFilter === 'C' && f.grade !== 'C' && f.grade !== '3') return false;
+        if (gradeFilter === 'DE' && !['D', 'E', '4', '5'].includes(f.grade)) return false;
+        if (onlyPublic && f.ownership !== '국공립') return false;
+        if (q && !f.name.toLowerCase().includes(q) && !f.addr.toLowerCase().includes(q)) return false;
+        return true;
+      })
+      .sort((a, b) => {
+        const sidoDiff = getSidoRank(a.sido) - getSidoRank(b.sido);
+        if (sidoDiff !== 0) return sidoDiff;
+        const sgDiff = (a.sigungu || '').localeCompare(b.sigungu || '', 'ko');
+        if (sgDiff !== 0) return sgDiff;
+        const gDiff = (GRADE_RANK[a.grade] ?? 9) - (GRADE_RANK[b.grade] ?? 9);
+        if (gDiff !== 0) return gDiff;
+        return a.name.localeCompare(b.name, 'ko');
+      });
   }, [
     facilities,
     selectedSido,
