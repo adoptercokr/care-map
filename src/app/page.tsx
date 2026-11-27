@@ -572,7 +572,9 @@ export default function HomePage() {
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-semibold text-slate-700">설립 / 지정일</span>
                       <span className="text-base font-extrabold text-[#0e8a8d]">
-                        {selectedFacility.established || '미제공'}
+                        {selectedFacility.established
+                          ? selectedFacility.established.replace(/-/g, '/')
+                          : '미제공'}
                       </span>
                     </div>
                   </div>

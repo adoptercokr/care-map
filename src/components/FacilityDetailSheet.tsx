@@ -136,7 +136,7 @@ export default function FacilityDetailSheet({
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-slate-700">설립 / 지정일</span>
             <span className="text-base font-extrabold text-slate-900">
-              {facility.established || '미제공'}
+              {facility.established ? facility.established.replace(/-/g, '/') : '미제공'}
             </span>
           </div>
         </div>
