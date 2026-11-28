@@ -128,6 +128,9 @@ export default function HomeHub({
               </h1>
               <p className="mt-2 text-[15px] sm:text-base text-slate-600">
                 국민건강보험공단 평가등급과 정원·대기·월 예상 본인부담금을 한눈에 확인합니다.
+                <span className="inline-block ml-2 px-2 py-0.5 rounded-md bg-teal-50 text-[#0e8a8d] text-xs font-bold align-middle">
+                  {syncMeta.displayDate} 업데이트
+                </span>
               </p>
             </div>
 
@@ -187,8 +190,8 @@ export default function HomeHub({
               <span className="text-sm font-semibold text-teal-700">
                 {filtered.length.toLocaleString()}곳
               </span>
-              <span className="hidden sm:inline text-xs text-slate-400">
-                · {syncMeta.displayDate} 업데이트
+              <span className="text-xs font-medium text-slate-500">
+                · {syncMeta.displayDate} 기준
               </span>
             </div>
             <button

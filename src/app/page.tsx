@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { CareFacility, ActiveTab, FacilityType, EvalGrade } from '../types/care';
 import { getGradeLabel, getCapacityLabel } from '../utils/gradeLabel';
 import { FACILITY_ICON_META } from '../utils/facilityIcons';
+import syncMeta from '../../public/data/sync_meta.json';
 import HomeHub from '../components/HomeHub';
 import RegionDirectory from '../components/RegionDirectory';
 import FacilityDetailSheet from '../components/FacilityDetailSheet';
@@ -245,13 +246,9 @@ export default function HomePage() {
         activeTab === 'map' ? 'h-dvh overflow-hidden' : 'min-h-screen'
       } flex flex-col bg-slate-50`}
     >
-      {/* 상단 헤더: 데스크톱 1줄 칼정렬 / 모바일은 로고+비교함 1줄 + 4등분 균등 탭 2줄(좌우 스크롤 0) */}
+      {/* 상단 헤더: 데스크톱 1줄 칼정렬(모든 탭 동일한 중앙 정렬) / 모바일은 로고+비교함 1줄 + 4등분 균등 탭 2줄 */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-[450] shrink-0">
-        <div
-          className={`h-14 md:h-16 flex items-center justify-between ${
-            activeTab === 'map' ? 'px-4 sm:px-6' : 'max-w-6xl mx-auto px-4 sm:px-5'
-          }`}
-        >
+        <div className="h-14 md:h-16 max-w-6xl mx-auto px-4 sm:px-5 flex items-center justify-between">
           <div className="flex items-center gap-6 sm:gap-10">
             <button
               onClick={() => setActiveTab('home')}
@@ -464,6 +461,9 @@ export default function HomePage() {
                   >
                     {gradeFilter === 'A' ? '✓ A등급만 보는 중' : 'A등급만 모아보기'}
                   </button>
+                </div>
+                <div className="text-[11px] text-slate-400 px-0.5">
+                  공단·심평원 공식 데이터 기준 · {syncMeta.displayDate} 업데이트
                 </div>
               </div>
 
