@@ -111,6 +111,7 @@ const STRUCTURED_DATA = {
         "@type": "Place",
         name: "대한민국 (South Korea)",
       },
+      license: "https://creativecommons.org/licenses/by/4.0/",
       isAccessibleForFree: true,
     },
     {
