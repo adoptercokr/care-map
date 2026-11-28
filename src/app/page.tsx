@@ -691,6 +691,7 @@ export default function HomePage() {
                               </span>
                               <span className={`px-2 py-0.5 rounded text-xs font-bold border ${gCls}`}>
                                 {getGradeLabel(f, true)}
+                                {f.score ? ` (${f.score}점)` : ''}
                               </span>
                             </div>
 
