@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Send, CheckCircle2, Loader2 } from 'lucide-react';
 import syncMeta from '../../public/data/sync_meta.json';
 
@@ -8,60 +8,71 @@ export default function Footer() {
   const [policyType, setPolicyType] = useState<'terms' | 'privacy' | 'contact' | null>(null);
 
   const [contactType, setContactType] = useState<'general' | 'correction' | 'ad'>('general');
-  const [company, setCompany] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [title, setTitle] = useState('');
-  const [replyTo, setReplyTo] = useState('');
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
-  const [sendResult, setSendResult] = useState<{ ok: boolean; text: string } | null>(null);
+  const [isSentDone, setIsSentDone] = useState(false);
+  const [errorText, setErrorText] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isSentDone) return;
+    const timer = setTimeout(() => {
+      setPolicyType(null);
+      setIsSentDone(false);
+    }, 2800);
+    return () => clearTimeout(timer);
+  }, [isSentDone]);
 
   const handleOpenContact = () => {
-    setSendResult(null);
+    setErrorText(null);
+    setIsSentDone(false);
     setPolicyType('contact');
+  };
+
+  const handleCloseModal = () => {
+    setPolicyType(null);
+    setIsSentDone(false);
+    setErrorText(null);
   };
 
   const handleSubmitContact = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!replyTo.trim() || !message.trim()) {
-      setSendResult({ ok: false, text: '회신 연락처와 문의 내용을 모두 입력해 주세요.' });
+    if (!name.trim() || !phone.trim() || !email.trim() || !title.trim() || !message.trim()) {
+      setErrorText('이름, 연락처, 이메일, 제목, 내용을 모두 입력해 주세요.');
       return;
     }
 
     setIsSending(true);
-    setSendResult(null);
+    setErrorText(null);
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: contactType,
-          company,
+          name,
+          phone,
+          email,
           title,
-          contact: replyTo,
           message,
         }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setSendResult({
-          ok: true,
-          text: data.message || '문의가 정상적으로 발송되었습니다.',
-        });
-        setCompany('');
+        setName('');
+        setPhone('');
+        setEmail('');
         setTitle('');
-        setReplyTo('');
         setMessage('');
+        setIsSentDone(true);
       } else {
-        setSendResult({
-          ok: false,
-          text: data.error || '전송에 실패했습니다. 잠시 후 다시 시도해 주세요.',
-        });
+        setErrorText(data.error || '전송에 실패했습니다. 잠시 후 다시 시도해 주세요.');
       }
     } catch {
-      setSendResult({
-        ok: false,
-        text: '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
-      });
+      setErrorText('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setIsSending(false);
     }
@@ -118,7 +129,7 @@ export default function Footer() {
                   : '제휴 및 정보 수정 문의'}
               </h3>
               <button
-                onClick={() => setPolicyType(null)}
+                onClick={handleCloseModal}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
               >
                 <X className="w-5 h-5" />
@@ -137,12 +148,31 @@ export default function Footer() {
                   <p>내 위치 찾기 기능은 브라우저 내 지도 이동 용도로만 일시 사용되며 저장되지 않습니다.</p>
                 </>
               )}
-              {policyType === 'contact' && (
-                <form onSubmit={handleSubmitContact} className="space-y-3.5">
-                  <p className="text-xs sm:text-sm text-slate-500">
-                    시설 정보 수정 요청, 서비스 오류 제보, 광고·제휴 문의를 남겨주시면 담당자에게 즉시 메일로 전달됩니다.
-                  </p>
-
+              {policyType === 'contact' && isSentDone && (
+                <div className="py-6 text-center space-y-4">
+                  <div className="w-14 h-14 mx-auto rounded-full bg-teal-50 text-[#0e8a8d] flex items-center justify-center">
+                    <CheckCircle2 className="w-8 h-8" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <h4 className="text-lg font-extrabold text-slate-900">
+                      문의가 정상적으로 발송되었습니다!
+                    </h4>
+                    <p className="text-sm text-slate-600">
+                      남겨주신 이메일과 연락처로 확인 후 빠르게 회신드리겠습니다.
+                    </p>
+                    <p className="text-xs text-slate-400">잠시 후 창이 자동으로 닫힙니다.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="h-10 px-6 rounded-xl bg-[#0e8a8d] hover:bg-[#0b7275] text-white text-sm font-bold transition"
+                  >
+                    확인
+                  </button>
+                </div>
+              )}
+              {policyType === 'contact' && !isSentDone && (
+                <form onSubmit={handleSubmitContact} className="space-y-3">
                   <div className="grid grid-cols-3 gap-2">
                     {[
                       { id: 'general', label: '일반 문의' },
@@ -164,70 +194,80 @@ export default function Footer() {
                     ))}
                   </div>
 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        이름 <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="성함 또는 기관·업체명"
+                        className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-[#0e8a8d]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        연락처 <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="예: 010-1234-5678"
+                        className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-[#0e8a8d]"
+                      />
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      기관명 / 업체명 (선택)
+                      이메일 <span className="text-rose-500">*</span>
                     </label>
                     <input
-                      type="text"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      placeholder="예: OO요양원 또는 업체명"
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="회신받으실 이메일 (예: name@example.com)"
                       className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-[#0e8a8d]"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      회신받을 연락처 또는 이메일 <span className="text-rose-500">*</span>
+                      제목 <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       required
-                      value={replyTo}
-                      onChange={(e) => setReplyTo(e.target.value)}
-                      placeholder="이메일 또는 휴대폰 번호"
-                      className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-[#0e8a8d]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      문의 제목 (선택)
-                    </label>
-                    <input
-                      type="text"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      placeholder="예: 시설 전화번호 수정 요청"
+                      placeholder="문의 제목을 입력해 주세요"
                       className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-[#0e8a8d]"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      문의 내용 <span className="text-rose-500">*</span>
+                      내용 <span className="text-rose-500">*</span>
                     </label>
                     <textarea
                       required
                       rows={4}
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      placeholder="자세한 내용을 적어주세요."
+                      placeholder="자세한 문의 내용을 적어주세요."
                       className="w-full p-3 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-[#0e8a8d] resize-none"
                     />
                   </div>
 
-                  {sendResult && (
-                    <div
-                      className={`p-3 rounded-xl text-xs sm:text-sm font-medium flex items-start gap-2 ${
-                        sendResult.ok
-                          ? 'bg-teal-50 text-teal-800 border border-teal-200'
-                          : 'bg-rose-50 text-rose-700 border border-rose-200'
-                      }`}
-                    >
-                      {sendResult.ok && <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />}
-                      <span>{sendResult.text}</span>
+                  {errorText && (
+                    <div className="p-3 rounded-xl text-xs sm:text-sm font-medium bg-rose-50 text-rose-700 border border-rose-200">
+                      {errorText}
                     </div>
                   )}
 

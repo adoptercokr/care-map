@@ -14,45 +14,38 @@ export async function POST(request: Request) {
     const body = await request.json();
     const {
       type = 'general',
+      name = '',
+      phone = '',
+      email = '',
       title = '',
-      contact = '',
-      company = '',
       message = '',
     } = body as {
       type?: 'general' | 'correction' | 'ad';
+      name?: string;
+      phone?: string;
+      email?: string;
       title?: string;
-      contact?: string;
-      company?: string;
       message?: string;
     };
 
-    const trimmedContact = contact.trim();
-    const trimmedMessage = message.trim();
-    const trimmedCompany = company.trim();
+    const trimmedName = name.trim();
+    const trimmedPhone = phone.trim();
+    const trimmedEmail = email.trim();
     const trimmedTitle = title.trim();
+    const trimmedMessage = message.trim();
 
-    if (!trimmedContact || !trimmedMessage) {
+    if (!trimmedName || !trimmedPhone || !trimmedEmail || !trimmedTitle || !trimmedMessage) {
       return NextResponse.json(
-        { success: false, error: '회신 연락처와 문의 내용을 모두 입력해 주세요.' },
+        { success: false, error: '이름, 연락처, 이메일, 제목, 내용을 모두 입력해 주세요.' },
         { status: 400 }
       );
     }
 
     const typeLabel =
       type === 'ad' ? '광고·제휴문의' : type === 'correction' ? '정보수정요청' : '일반문의';
-    const defaultTitle =
-      type === 'ad'
-        ? '배너 광고 및 비즈니스 제휴 제안'
-        : type === 'correction'
-        ? '시설 정보 수정 및 등록 요청'
-        : '서비스 이용 및 오류 제보 문의';
-    const finalTitle = trimmedTitle || defaultTitle;
 
     const senderName = `[케어맵 care.animap.co.kr] ${typeLabel}`;
-    const mailSubject = `[케어맵 care.animap.co.kr] ${typeLabel}: ${
-      trimmedCompany ? `[${trimmedCompany}] ` : ''
-    }${finalTitle}`;
-
+    const mailSubject = `[케어맵 care.animap.co.kr] ${typeLabel}: [${trimmedName}] ${trimmedTitle}`;
     const nowStr = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
 
     const payload: Record<string, string> = {
@@ -60,23 +53,17 @@ export async function POST(request: Request) {
       _subject: mailSubject,
       사이트출처: '케어맵 (care.animap.co.kr) - 전국 요양병원·요양원·주간보호 지도',
       문의유형: typeLabel,
-      ...(trimmedCompany ? { 기관명_업체명: trimmedCompany } : {}),
-      문의제목: finalTitle,
-      회신연락처: trimmedContact,
-      문의내용: trimmedMessage,
+      이름: trimmedName,
+      연락처: trimmedPhone,
+      이메일: trimmedEmail,
+      제목: trimmedTitle,
+      내용: trimmedMessage,
       접수일시: nowStr,
+      email: trimmedEmail,
+      _replyto: trimmedEmail,
     };
 
-    if (trimmedContact.includes('@')) {
-      payload._replyto = trimmedContact;
-      payload.email = trimmedContact;
-    } else {
-      payload.email = 'noreply@care.animap.co.kr';
-      payload._replyto = 'noreply@care.animap.co.kr';
-    }
-
     const emailPromises = [
-      // 채널 1: Formspree
       fetch(FORMSPREE_NAVER_ENDPOINT, {
         method: 'POST',
         headers: {
@@ -86,7 +73,6 @@ export async function POST(request: Request) {
         body: JSON.stringify(payload),
       }).catch(() => null),
 
-      // 채널 2: ShipMyForm (2순위 백업 메일)
       fetch(`https://shipmyform.com/to/${GMAIL_DEST}`, {
         method: 'POST',
         headers: {
@@ -98,7 +84,6 @@ export async function POST(request: Request) {
         body: JSON.stringify(payload),
       }).catch(() => null),
 
-      // 채널 3: ShipMyForm (1순위 네이버 메일)
       fetch(`https://shipmyform.com/to/${NAVER_EMAIL_DEST}`, {
         method: 'POST',
         headers: {
@@ -110,7 +95,6 @@ export async function POST(request: Request) {
         body: JSON.stringify(payload),
       }).catch(() => null),
 
-      // 채널 4: FormSubmit
       fetch(`https://formsubmit.co/ajax/${NAVER_EMAIL_DEST}`, {
         method: 'POST',
         headers: {
@@ -138,7 +122,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: '문의가 정상적으로 발송되었습니다. 남겨주신 연락처로 확인 후 회신드리겠습니다.',
+      message: '문의가 정상적으로 발송되었습니다. 확인 후 빠르게 회신드리겠습니다.',
     });
   } catch {
     return NextResponse.json(
