@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { CareFacility, FacilityType } from '../types/care';
 import { getGradeLabel, getCapacityLabel } from '../utils/gradeLabel';
+import syncMeta from '../../public/data/sync_meta.json';
 import {
   MapPin,
   Phone,
@@ -279,7 +280,7 @@ export default function RegionDirectory({
           검색 결과 <span className="text-teal-700">{filtered.length.toLocaleString()}곳</span>
         </div>
         <div className="text-xs sm:text-sm text-slate-500">
-          정원·현원·대기인원 및 1인실 비용은 시설 사정에 따라 변동될 수 있습니다.
+          정원·현원·대기인원 및 1인실 비용은 시설 사정에 따라 변동될 수 있습니다. (데이터 기준: {syncMeta.displayDate})
         </div>
       </div>
 

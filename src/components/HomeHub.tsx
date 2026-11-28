@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { CareFacility, FacilityType, ActiveTab } from '../types/care';
 import { getGradeLabel, getCapacityLabel } from '../utils/gradeLabel';
+import syncMeta from '../../public/data/sync_meta.json';
 import {
   Search,
   MapPin,
@@ -185,6 +186,9 @@ export default function HomeHub({
               </h2>
               <span className="text-sm font-semibold text-teal-700">
                 {filtered.length.toLocaleString()}곳
+              </span>
+              <span className="hidden sm:inline text-xs text-slate-400">
+                · {syncMeta.displayDate} 업데이트
               </span>
             </div>
             <button

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Send, CheckCircle2, Loader2 } from 'lucide-react';
+import syncMeta from '../../public/data/sync_meta.json';
 
 export default function Footer() {
   const [policyType, setPolicyType] = useState<'terms' | 'privacy' | 'contact' | null>(null);
@@ -82,7 +83,7 @@ export default function Footer() {
                 전국 요양병원·요양원·주간보호센터·방문요양 기관 정보를 지도와 지역별 목록으로 쉽게 비교할 수 있는 시니어 돌봄 정보 플랫폼입니다.
               </p>
               <p className="text-xs text-slate-400">
-                데이터 출처: 국민건강보험공단 장기요양기관 정보 및 평가결과 · 건강보험심사평가원 병원정보서비스 (본 정보는 참고용이며, 실제 입소·진료 전 해당 기관에 직접 확인하시기 바랍니다.)
+                데이터 출처: 국민건강보험공단 장기요양기관 정보 및 평가결과 · 건강보험심사평가원 병원정보서비스 (최종 동기화: {syncMeta.displayDate} · 실제 입소·진료 전 해당 기관에 직접 확인하시기 바랍니다.)
               </p>
             </div>
 
